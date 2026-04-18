@@ -54,6 +54,114 @@
       justify-content: center;
     }
 
+    /* Left: planet dossier (opens when a planet is selected in system view) */
+    .planet-panel {
+      position: fixed;
+      z-index: 40;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: min(22rem, calc(100vw - 1.25rem));
+      max-height: 100dvh;
+      padding: 1rem 1.15rem;
+      padding-top: max(1rem, env(safe-area-inset-top, 0px));
+      padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+      background: rgba(15, 23, 42, 0.94);
+      border-right: 1px solid rgba(148, 163, 184, 0.28);
+      box-shadow: 8px 0 32px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(12px);
+      transform: translateX(-100%);
+      visibility: hidden;
+      transition:
+        transform 0.38s var(--zoom-ease),
+        visibility 0s linear 0.38s;
+      overflow-y: auto;
+      pointer-events: none;
+    }
+
+    .planet-panel.planet-panel--open {
+      transform: translateX(0);
+      visibility: visible;
+      transition: transform 0.38s var(--zoom-ease);
+      pointer-events: auto;
+    }
+
+    .planet-panel__header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .planet-panel__title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      line-height: 1.25;
+      color: #f8fafc;
+    }
+
+    .planet-panel__close {
+      flex-shrink: 0;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(30, 41, 59, 0.9);
+      color: var(--text-muted);
+      font-size: 1.25rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .planet-panel__close:hover {
+      color: var(--text-main);
+      background: rgba(51, 65, 85, 0.95);
+      border-color: rgba(148, 163, 184, 0.55);
+    }
+
+    .planet-panel__meta {
+      font-size: 0.8rem;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      margin-bottom: 1rem;
+    }
+
+    .planet-panel__desc {
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: var(--text-main);
+      margin-bottom: 1.25rem;
+    }
+
+    .planet-panel__stats {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .planet-panel__stat {
+      display: grid;
+      grid-template-columns: 7.5rem 1fr;
+      gap: 0.5rem 0.75rem;
+      font-size: 0.82rem;
+      align-items: baseline;
+    }
+
+    .planet-panel__label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .planet-panel__value {
+      color: #e2e8f0;
+    }
+
     .system-wrap {
       position: relative;
       width: 100%;
@@ -180,13 +288,22 @@
       transform: translate(-50%, -50%);
       border-radius: 50%;
       box-shadow: 0 0 10px rgba(15, 23, 42, 0.95);
+      pointer-events: none;
+      outline: none;
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
     }
 
-    .p1 { width: 12px; height: 12px; background: radial-gradient(circle at 30% 20%, #e2e8f0, #94a3b8, #475569); }
-    .p2 { width: 16px; height: 16px; background: radial-gradient(circle at 30% 20%, #bae6fd, #0ea5e9, #0369a1); }
-    .p3 { width: 20px; height: 20px; background: radial-gradient(circle at 30% 20%, #fcd34d, #f59e0b, #b45309); }
-    .p4 { width: 18px; height: 18px; background: radial-gradient(circle at 30% 20%, #fecaca, #f97316, #7c2d12); }
-    .p5 { width: 14px; height: 14px; background: radial-gradient(circle at 30% 20%, #bbf7d0, #22c55e, #166534); }
+    .viewport.is-zoomed-out .planet {
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    .planet.planet--selected {
+      box-shadow:
+        0 0 0 2px rgba(56, 189, 248, 0.95),
+        0 0 14px rgba(15, 23, 42, 0.95);
+      transform: translate(-50%, -50%) scale(1.12);
+    }
 
     .landing {
       position: absolute;
@@ -290,7 +407,8 @@
         transition-duration: 0.01ms;
       }
       .landing,
-      .zoom-hint {
+      .zoom-hint,
+      .planet-panel {
         transition-duration: 0.01ms;
       }
       .orbit {
@@ -300,6 +418,9 @@
       .sun {
         animation: none;
       }
+      .planet {
+        transition-duration: 0.01ms;
+      }
     }
   </style>
 </head>
@@ -307,13 +428,30 @@
   <div class="stars" aria-hidden="true"></div>
 
   <div class="viewport" id="viewport">
+    <aside
+      class="planet-panel"
+      id="planetPanel"
+      aria-hidden="true"
+      aria-labelledby="planetPanelTitle"
+    >
+      <div class="planet-panel__header">
+        <h2 class="planet-panel__title" id="planetPanelTitle"></h2>
+        <button type="button" class="planet-panel__close" id="planetPanelClose" aria-label="Close planet details">
+          ×
+        </button>
+      </div>
+      <p class="planet-panel__meta" id="planetPanelMeta"></p>
+      <p class="planet-panel__desc" id="planetPanelDesc"></p>
+      <div class="planet-panel__stats" id="planetPanelStats"></div>
+    </aside>
+
     <div class="landing">
       <div class="title">
         <span class="re">RE-</span>
         <span class="plan">PLAN</span>
         <span class="it">-IT</span>
       </div>
-      <p class="subtitle" align>
+      <p class="subtitle">
         Find the perfect alien home — click the star to pull back and see the whole system.
       </p>
       <p class="tap-hint"><strong>Tip:</strong> Click the star again to return to the landing view.</p>
@@ -323,32 +461,17 @@
       <div class="system" aria-hidden="true">
         <button type="button" class="sun" id="sun" aria-label="Zoom: show full star system"></button>
 
-        <div class="orbit orbit--1"><div class="planet p1"></div></div>
-        <div class="orbit orbit--2"><div class="planet p2"></div></div>
-        <div class="orbit orbit--3"><div class="planet p3"></div></div>
-        <div class="orbit orbit--4"><div class="planet p4"></div></div>
-        <div class="orbit orbit--5"><div class="planet p5"></div></div>
+        <div class="orbit orbit--1"><div class="planet"></div></div>
+        <div class="orbit orbit--2"><div class="planet"></div></div>
+        <div class="orbit orbit--3"><div class="planet"></div></div>
+        <div class="orbit orbit--4"><div class="planet"></div></div>
+        <div class="orbit orbit--5"><div class="planet"></div></div>
       </div>
     </div>
 
     <p class="zoom-hint" id="zoomHint">Solar system view — click the sun to zoom back in</p>
   </div>
 
-  <script>
-    const viewport = document.getElementById('viewport');
-    const sun = document.getElementById('sun');
-
-    function setZoomedOut(on) {
-      viewport.classList.toggle('is-zoomed-out', on);
-      sun.setAttribute(
-        'aria-label',
-        on ? 'Zoom in: return to landing view' : 'Zoom out: show full star system'
-      );
-    }
-
-    sun.addEventListener('click', () => {
-      setZoomedOut(!viewport.classList.contains('is-zoomed-out'));
-    });
-  </script>
+  <script type="module" src="/src/landing-page.ts"></script>
 </body>
 </html>
