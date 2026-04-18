@@ -1,4 +1,13 @@
 export function getHabitabilityScore(planet) {
+  // Meteors and barren worlds score zero
+  if (planet.type === "Meteor" || planet.type === "Barren" || planet.type === "Gas Giant" || planet.type === "Gas Dwarf") {
+    return {
+      score: 0,
+      verdict: "Not Habitable",
+      reasons: ["❌ Not a terrestrial planet — no surface, atmosphere, or water possible"]
+    }
+  }
+
   let score = 0
   let reasons = []
 
@@ -30,9 +39,11 @@ export function getHabitabilityScore(planet) {
     reasons.push("✅ Breathable atmosphere")
   } else if (planet.atmosphere === "CO2" || planet.atmosphere === "Nitrogen") {
     score += 10
-    reasons.push("⚠️ Atmosphere is present but not breathable")
+    reasons.push("⚠️ Atmosphere present but not breathable")
+  } else if (!planet.atmosphere) {
+    reasons.push("❌ No atmosphere")
   } else {
-    reasons.push("❌ Atmosphere is toxic or absent")
+    reasons.push("❌ Atmosphere is toxic")
   }
 
   // Mass (0-15 points)
@@ -43,7 +54,7 @@ export function getHabitabilityScore(planet) {
     score += 8
     reasons.push("⚠️ Gravity is survivable but uncomfortable")
   } else {
-    reasons.push("❌ Gravity is too strong or too weak to survive")
+    reasons.push("❌ Gravity is too strong or too weak")
   }
 
   // Weather (0-10 points)
@@ -55,9 +66,11 @@ export function getHabitabilityScore(planet) {
     reasons.push("⚠️ Weather is manageable")
   } else if (planet.weather === "Extreme") {
     reasons.push("❌ Weather is too dangerous")
+  } else {
+    reasons.push("❌ No weather data available")
   }
 
-  // Final verdict
+  // Verdict
   let verdict
   if (score >= 70) {
     verdict = "Habitable"
