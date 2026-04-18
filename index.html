@@ -280,8 +280,14 @@
       transform: translate(-50%, -50%);
       pointer-events: none;
       z-index: 2;
+      opacity: 0;
+      transition: opacity calc(var(--zoom-duration) * .45) var(--zoom-ease);
     }
-    .viewport.is-zoomed-out .planet-wrap { pointer-events: auto; cursor: pointer; }
+    .viewport.is-zoomed-out .planet-wrap {
+      opacity: 1;
+      pointer-events: auto;
+      cursor: pointer;
+    }
 
     .planet {
       border-radius: 50%;
@@ -742,7 +748,8 @@ const orbitAngles = ORBIT_CONFIG.map(c => c.angle);
 // The system element is min(98vmin, 900px) square, centred at 50%/50%.
 // Our maxR values assume the 900px max. Scale linearly with actual size.
 function getOrbitR(i) {
-  const systemSize = Math.min(window.innerWidth, window.innerHeight) * 0.98;
+  const systemEl = document.getElementById('systemEl');
+  const systemSize = Math.min(systemEl.clientWidth, systemEl.clientHeight);
   const scale = Math.min(systemSize, 900) / 900;
   return ORBIT_CONFIG[i].maxR * scale;
 }
@@ -756,12 +763,12 @@ function orbitTick(ts) {
   const dt = ts - lastTime;
   lastTime = ts;
 
-  // Get system centre in system-el coordinates (system el is positioned at centre of system-wrap)
+  // Get centre in local (unscaled) system coordinates.
+  // Using getBoundingClientRect() here includes CSS zoom scale and causes
+  // diagonal drift during the zoom transition.
   const systemEl = document.getElementById('systemEl');
-  const systemRect = systemEl.getBoundingClientRect();
-  // Centre of system in system-el local coords
-  const cx = systemRect.width / 2;
-  const cy = systemRect.height / 2;
+  const cx = systemEl.clientWidth / 2;
+  const cy = systemEl.clientHeight / 2;
 
   ORBIT_CONFIG.forEach((cfg, i) => {
     // Advance angle
