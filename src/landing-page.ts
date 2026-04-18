@@ -1,7 +1,4 @@
-import { levels } from "./data/planets.js";
-
-type Level = (typeof levels)[number];
-type Planet = Level["planets"][number];
+import { levels, type Level, type Planet } from "./data/planets.js";
 
 function hasOzoneLayer(p: Planet): boolean {
   const o = p as Planet & { ozoneLayer?: boolean; ozonLayer?: boolean };
@@ -99,27 +96,31 @@ function renderPlanetPanel(p: Planet): void {
   appendStatRow(stats, "Ozone layer", hasOzoneLayer(p) ? "Yes" : "No");
 }
 
-const level1 = levels.find((l) => l.id === 1);
+const level1 = levels.find((l: Level) => l.id === 1);
 if (!level1) {
   throw new Error("planets.js: level 1 (System Solara) not found");
 }
 
-const viewport = document.getElementById("viewport");
-const sun = document.getElementById("sun");
+const viewportEl = document.getElementById("viewport");
+const sunEl = document.getElementById("sun");
 const zoomHint = document.getElementById("zoomHint");
-const planetPanel = document.getElementById("planetPanel");
+const planetPanelEl = document.getElementById("planetPanel");
 const planetPanelClose = document.getElementById("planetPanelClose");
 
-if (!viewport || !(sun instanceof HTMLButtonElement) || !planetPanel) {
+if (!viewportEl || !(sunEl instanceof HTMLButtonElement) || !planetPanelEl) {
   throw new Error("Landing DOM: #viewport, #sun, or #planetPanel missing");
 }
+
+const viewport = viewportEl;
+const sun = sunEl;
+const planetPanel = planetPanelEl;
 
 sun.title = `${level1.star.name} — ${level1.star.type}`;
 if (zoomHint) {
   zoomHint.textContent = `${level1.name} — click the sun to zoom back in`;
 }
 
-const planetById = new Map(level1.planets.map((p) => [p.id, p]));
+const planetById = new Map(level1.planets.map((p: Planet) => [p.id, p]));
 let selectedPlanetId: string | null = null;
 
 function setPanelOpen(open: boolean) {
@@ -152,7 +153,7 @@ function selectPlanet(id: string) {
 }
 
 const orbitEls = document.querySelectorAll(".system .orbit");
-level1.planets.forEach((planet, index) => {
+level1.planets.forEach((planet: Planet, index: number) => {
   const orbit = orbitEls[index];
   if (!(orbit instanceof HTMLElement)) return;
   const dot = orbit.querySelector(".planet");
