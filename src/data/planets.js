@@ -5,22 +5,25 @@ export const levels = [
     star: {
       name: "Solara",
       type: "Yellow Dwarf",
+      color: "#FFD700",
+      size: 2.5,
       description: "A stable, warm star similar to our own sun. Conditions are relatively forgiving."
     },
     planets: [
       {
         id: "1-1",
-        name: "Verdania",
-        type: "Terrestrial",
-        temperature: 18,
-        waterCoverage: 65,
-        atmosphere: "Nitrogen-Oxygen",
-        atmosphereThickness: "Thick",
-        mass: 1.1,
-        weather: "Mild",
-        ozonLayer: true,
-        description: "A lush, green world with vast forests and calm seas.",
-        bestAnswer: true
+        name: "Meteor Chunk A",
+        type: "Meteor",
+        size: "Small",
+        temperature: 290,
+        waterCoverage: null,
+        atmosphere: null,
+        atmosphereThickness: null,
+        mass: null,
+        weather: null,
+        ozoneLayer: false,
+        description: "A small rocky chunk tumbling through the system, scorched by Solara's rays.",
+        bestAnswer: false
       },
       {
         id: "1-2",
@@ -38,6 +41,20 @@ export const levels = [
       },
       {
         id: "1-3",
+        name: "Verdania",
+        type: "Terrestrial",
+        temperature: 18,
+        waterCoverage: 65,
+        atmosphere: "Nitrogen-Oxygen",
+        atmosphereThickness: "Thick",
+        mass: 1.1,
+        weather: "Mild",
+        ozoneLayer: true,
+        description: "A lush, green world with vast forests and calm seas.",
+        bestAnswer: true
+      },
+      {
+        id: "1-4",
         name: "Glacius",
         type: "Ice Planet",
         temperature: -85,
@@ -48,21 +65,6 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "A frozen world entirely encased in thick ice sheets.",
-        bestAnswer: false
-      },
-      {
-        id: "1-4",
-        name: "Meteor chunk A",
-        type: "Meteor",
-        size: "Small",
-        temperature: 290,
-        waterCoverage: null,
-        atmosphere: null,
-        atmosphereThickness: null,
-        mass: null,
-        weather: null,
-        ozoneLayer: false,
-        description: "A small rocky chunk tumbling through the system, scorched by Solara's rays.",
         bestAnswer: false
       },
       {
@@ -88,25 +90,13 @@ export const levels = [
     star: {
       name: "Auron",
       type: "Orange Dwarf",
+      color: "#FF8C00",
+      size: 2.0,
       description: "A slightly cooler star than our sun. Habitable zones are closer in, and conditions are trickier to read."
     },
     planets: [
       {
         id: "2-1",
-        name: "Tempera",
-        type: "Terrestrial",
-        temperature: 28,
-        waterCoverage: 55,
-        atmosphere: "Nitrogen-Oxygen",
-        atmosphereThickness: "Thick",
-        mass: 1.3,
-        weather: "Moderate",
-        ozoneLayer: true,
-        description: "A warm humid world with frequent rainstorms but stable enough conditions for life.",
-        bestAnswer: true
-      },
-      {
-        id: "2-2",
         name: "Ferrox",
         type: "Terrestrial",
         temperature: 55,
@@ -120,21 +110,7 @@ export const levels = [
         bestAnswer: false
       },
       {
-        id: "2-3",
-        name: "Mirava",
-        type: "Terrestrial",
-        temperature: -15,
-        waterCoverage: 45,
-        atmosphere: "Nitrogen-Oxygen",
-        atmosphereThickness: "Thin",
-        mass: 0.6,
-        weather: "Moderate",
-        ozoneLayer: false,
-        description: "A cold but somewhat promising world — thin air makes it a tough call.",
-        bestAnswer: true
-      },
-      {
-        id: "2-4",
+        id: "2-2",
         name: "Sulphara",
         type: "Gas Dwarf",
         temperature: 120,
@@ -148,7 +124,49 @@ export const levels = [
         bestAnswer: false
       },
       {
+        id: "2-3",
+        name: "Duskara",
+        type: "Terrestrial",
+        temperature: 38,
+        waterCoverage: 30,
+        atmosphere: "Nitrogen",
+        atmosphereThickness: "Moderate",
+        mass: 1.0,
+        weather: "Moderate",
+        ozoneLayer: false,
+        description: "Decent gravity and size, but lacks oxygen and has very little water.",
+        bestAnswer: false
+      },
+      {
+        id: "2-4",
+        name: "Tempera",
+        type: "Terrestrial",
+        temperature: 28,
+        waterCoverage: 55,
+        atmosphere: "Nitrogen-Oxygen",
+        atmosphereThickness: "Thick",
+        mass: 1.3,
+        weather: "Moderate",
+        ozoneLayer: true,
+        description: "A warm humid world with frequent rainstorms but stable enough conditions for life.",
+        bestAnswer: true
+      },
+      {
         id: "2-5",
+        name: "Mirava",
+        type: "Terrestrial",
+        temperature: -15,
+        waterCoverage: 45,
+        atmosphere: "Nitrogen-Oxygen",
+        atmosphereThickness: "Thin",
+        mass: 0.6,
+        weather: "Moderate",
+        ozoneLayer: false,
+        description: "A cold but somewhat promising world — thin air makes it a tough call.",
+        bestAnswer: true
+      },
+      {
+        id: "2-6",
         name: "Meteor Chunk C",
         type: "Meteor",
         size: "Large",
@@ -161,20 +179,6 @@ export const levels = [
         ozoneLayer: false,
         description: "A moon-sized rock with deep craters and no signs of anything useful.",
         bestAnswer: false
-      },
-      {
-        id: "2-6",
-        name: "Duskara",
-        type: "Terrestrial",
-        temperature: 38,
-        waterCoverage: 30,
-        atmosphere: "Nitrogen",
-        atmosphereThickness: "Moderate",
-        mass: 1.0,
-        weather: "Moderate",
-        ozoneLayer: false,
-        description: "Decent gravity and size, but lacks oxygen and has very little water.",
-        bestAnswer: false
       }
     ]
   },
@@ -184,25 +188,13 @@ export const levels = [
     star: {
       name: "Caelrix",
       type: "Blue Giant",
+      color: "#5b9bd5",
+      size: 4.0,
       description: "A massive, intensely hot star pumping out radiation. No perfect worlds here — survival is the best you can hope for."
     },
     planets: [
       {
         id: "3-1",
-        name: "Scoria",
-        type: "Terrestrial",
-        temperature: 58,
-        waterCoverage: 22,
-        atmosphere: "Nitrogen-Oxygen",
-        atmosphereThickness: "Thin",
-        mass: 1.2,
-        weather: "Extreme",
-        ozoneLayer: false,
-        description: "Hot and dry with a breathable but thin atmosphere. Survivable, barely.",
-        bestAnswer: true
-      },
-      {
-        id: "3-2",
         name: "Pyreth",
         type: "Volcanic",
         temperature: 310,
@@ -216,35 +208,7 @@ export const levels = [
         bestAnswer: false
       },
       {
-        id: "3-3",
-        name: "Halcyon",
-        type: "Terrestrial",
-        temperature: -18,
-        waterCoverage: 40,
-        atmosphere: "Nitrogen-Oxygen",
-        atmosphereThickness: "Moderate",
-        mass: 0.7,
-        weather: "Moderate",
-        ozoneLayer: true,
-        description: "Cold but shielded. Low gravity makes it tough, but it's the most promising option here.",
-        bestAnswer: true
-      },
-      {
-        id: "3-4",
-        name: "Rhovex",
-        type: "Gas Giant",
-        temperature: -140,
-        waterCoverage: null,
-        atmosphere: "Hydrogen-Helium",
-        atmosphereThickness: "Extreme",
-        mass: 18.0,
-        weather: "Extreme",
-        ozoneLayer: false,
-        description: "A massive gas giant with no solid surface and crushing gravity.",
-        bestAnswer: false
-      },
-      {
-        id: "3-5",
+        id: "3-2",
         name: "Meteor Chunk D",
         type: "Meteor",
         size: "Small",
@@ -259,7 +223,7 @@ export const levels = [
         bestAnswer: false
       },
       {
-        id: "3-6",
+        id: "3-3",
         name: "Vantara",
         type: "Terrestrial",
         temperature: 65,
@@ -273,7 +237,21 @@ export const levels = [
         bestAnswer: false
       },
       {
-        id: "3-7",
+        id: "3-4",
+        name: "Scoria",
+        type: "Terrestrial",
+        temperature: 58,
+        waterCoverage: 22,
+        atmosphere: "Nitrogen-Oxygen",
+        atmosphereThickness: "Thin",
+        mass: 1.2,
+        weather: "Extreme",
+        ozoneLayer: false,
+        description: "Hot and dry with a breathable but thin atmosphere. Survivable, barely.",
+        bestAnswer: true
+      },
+      {
+        id: "3-5",
         name: "Meteor Chunk E",
         type: "Meteor",
         size: "Medium",
@@ -286,6 +264,34 @@ export const levels = [
         ozoneLayer: false,
         description: "A city-sized chunk of scorched rock with deep radiation burns across its surface.",
         bestAnswer: false
+      },
+      {
+        id: "3-6",
+        name: "Halcyon",
+        type: "Terrestrial",
+        temperature: -18,
+        waterCoverage: 40,
+        atmosphere: "Nitrogen-Oxygen",
+        atmosphereThickness: "Moderate",
+        mass: 0.7,
+        weather: "Moderate",
+        ozoneLayer: true,
+        description: "Cold but shielded. Low gravity makes it tough, but it's the most promising option here.",
+        bestAnswer: true
+      },
+      {
+        id: "3-7",
+        name: "Rhovex",
+        type: "Gas Giant",
+        temperature: -140,
+        waterCoverage: null,
+        atmosphere: "Hydrogen-Helium",
+        atmosphereThickness: "Extreme",
+        mass: 18.0,
+        weather: "Extreme",
+        ozoneLayer: false,
+        description: "A massive gas giant with no solid surface and crushing gravity.",
+        bestAnswer: false
       }
     ]
   },
@@ -295,6 +301,8 @@ export const levels = [
     star: {
       name: "Rubrik",
       type: "Red Dwarf",
+      color: "#e74c3c",
+      size: 1.5,
       description: "A dim, cool star. Planets must orbit very close to get any warmth, leading to tidal locking and unpredictable conditions."
     },
     planets: [
@@ -328,34 +336,20 @@ export const levels = [
       },
       {
         id: "4-3",
-        name: "Flara",
-        type: "Terrestrial",
-        temperature: 48,
-        waterCoverage: 30,
-        atmosphere: "Nitrogen-Oxygen",
-        atmosphereThickness: "Thin",
-        mass: 1.1,
+        name: "Veldris",
+        type: "Volcanic",
+        temperature: 200,
+        waterCoverage: 0,
+        atmosphere: "Sulfur Dioxide",
+        atmosphereThickness: "Very Thick",
+        mass: 2.8,
         weather: "Extreme",
         ozoneLayer: false,
-        description: "Constantly bombarded by solar flares from Rubrik. Atmosphere is being slowly stripped away.",
+        description: "Heated from within by volcanic activity rather than the star. Toxic and crushing.",
         bestAnswer: false
       },
       {
         id: "4-4",
-        name: "Cryovast",
-        type: "Ice Planet",
-        temperature: -110,
-        waterCoverage: 85,
-        atmosphere: "Nitrogen",
-        atmosphereThickness: "Thin",
-        mass: 1.4,
-        weather: "Extreme",
-        ozoneLayer: false,
-        description: "An ocean world completely frozen over. Possibly liquid beneath the ice, but the surface is uninhabitable.",
-        bestAnswer: false
-      },
-      {
-        id: "4-5",
         name: "Margon",
         type: "Terrestrial",
         temperature: 22,
@@ -369,7 +363,35 @@ export const levels = [
         bestAnswer: true
       },
       {
+        id: "4-5",
+        name: "Flara",
+        type: "Terrestrial",
+        temperature: 48,
+        waterCoverage: 30,
+        atmosphere: "Nitrogen-Oxygen",
+        atmosphereThickness: "Thin",
+        mass: 1.1,
+        weather: "Extreme",
+        ozoneLayer: false,
+        description: "Constantly bombarded by solar flares from Rubrik. Atmosphere is being slowly stripped away.",
+        bestAnswer: false
+      },
+      {
         id: "4-6",
+        name: "Cryovast",
+        type: "Ice Planet",
+        temperature: -110,
+        waterCoverage: 85,
+        atmosphere: "Nitrogen",
+        atmosphereThickness: "Thin",
+        mass: 1.4,
+        weather: "Extreme",
+        ozoneLayer: false,
+        description: "An ocean world completely frozen over. Possibly liquid beneath the ice, but the surface is uninhabitable.",
+        bestAnswer: false
+      },
+      {
+        id: "4-7",
         name: "Meteor Chunk F",
         type: "Meteor",
         size: "Large",
@@ -381,20 +403,6 @@ export const levels = [
         weather: null,
         ozoneLayer: false,
         description: "A large frozen rock drifting at the edge of the system, far from Rubrik's warmth.",
-        bestAnswer: false
-      },
-      {
-        id: "4-7",
-        name: "Veldris",
-        type: "Volcanic",
-        temperature: 200,
-        waterCoverage: 0,
-        atmosphere: "Sulfur Dioxide",
-        atmosphereThickness: "Very Thick",
-        mass: 2.8,
-        weather: "Extreme",
-        ozoneLayer: false,
-        description: "Heated from within by volcanic activity rather than the star. Toxic and crushing.",
         bestAnswer: false
       },
       {
@@ -420,53 +428,14 @@ export const levels = [
     star: {
       name: "Diaxis",
       type: "Binary Stars",
-      description: "Two stars orbiting each other — Diaxis-A (hot blue) and Diaxis-B (cool red). Gravitational chaos makes conditions wildly unpredictable. No perfect answers exist here."
+      color: "#5b9bd5",
+      colorSecondary: "#e74c3c",
+      size: 3.0,
+      description: "Two stars orbiting each other — Diaxis-A (hot blue) and Diaxis-B (cool red). Gravitational chaos makes conditions wildly unpredictable."
     },
     planets: [
       {
         id: "5-1",
-        name: "Paradox",
-        type: "Terrestrial",
-        temperature: 35,
-        waterCoverage: 40,
-        atmosphere: "Nitrogen-Oxygen",
-        atmosphereThickness: "Moderate",
-        mass: 1.6,
-        weather: "Extreme",
-        ozoneLayer: false,
-        description: "The most Earth-like in the system, but gravitational stress from both stars causes constant earthquakes and atmospheric instability.",
-        bestAnswer: true
-      },
-      {
-        id: "5-2",
-        name: "Ecliptor",
-        type: "Terrestrial",
-        temperature: -5,
-        waterCoverage: 55,
-        atmosphere: "Nitrogen-Oxygen",
-        atmosphereThickness: "Thin",
-        mass: 0.4,
-        weather: "Extreme",
-        ozoneLayer: false,
-        description: "Passes between both stars in its orbit, swinging between freezing and scorching every few months.",
-        bestAnswer: true
-      },
-      {
-        id: "5-3",
-        name: "Duskrife",
-        type: "Terrestrial",
-        temperature: 70,
-        waterCoverage: 10,
-        atmosphere: "CO2",
-        atmosphereThickness: "Very Thick",
-        mass: 2.2,
-        weather: "Extreme",
-        ozoneLayer: false,
-        description: "A heavy, hot world baking under two suns with a runaway greenhouse effect.",
-        bestAnswer: false
-      },
-      {
-        id: "5-4",
         name: "Nullis",
         type: "Barren",
         temperature: 95,
@@ -480,7 +449,35 @@ export const levels = [
         bestAnswer: false
       },
       {
-        id: "5-5",
+        id: "5-2",
+        name: "Duskrife",
+        type: "Terrestrial",
+        temperature: 70,
+        waterCoverage: 10,
+        atmosphere: "CO2",
+        atmosphereThickness: "Very Thick",
+        mass: 2.2,
+        weather: "Extreme",
+        ozoneLayer: false,
+        description: "A heavy, hot world baking under two suns with a runaway greenhouse effect.",
+        bestAnswer: false
+      },
+      {
+        id: "5-3",
+        name: "Paradox",
+        type: "Terrestrial",
+        temperature: 35,
+        waterCoverage: 40,
+        atmosphere: "Nitrogen-Oxygen",
+        atmosphereThickness: "Moderate",
+        mass: 1.6,
+        weather: "Extreme",
+        ozoneLayer: false,
+        description: "The most Earth-like in the system, but gravitational stress from both stars causes constant earthquakes and atmospheric instability.",
+        bestAnswer: true
+      },
+      {
+        id: "5-4",
         name: "Meteor Chunk H",
         type: "Meteor",
         size: "Medium",
@@ -495,21 +492,21 @@ export const levels = [
         bestAnswer: false
       },
       {
-        id: "5-6",
-        name: "Vortaxis",
-        type: "Gas Giant",
-        temperature: -80,
-        waterCoverage: null,
-        atmosphere: "Hydrogen-Helium",
-        atmosphereThickness: "Extreme",
-        mass: 25.0,
+        id: "5-5",
+        name: "Ecliptor",
+        type: "Terrestrial",
+        temperature: -5,
+        waterCoverage: 55,
+        atmosphere: "Nitrogen-Oxygen",
+        atmosphereThickness: "Thin",
+        mass: 0.4,
         weather: "Extreme",
         ozoneLayer: false,
-        description: "A massive gas giant with a swirling storm the size of a continent that has lasted for centuries.",
-        bestAnswer: false
+        description: "Passes between both stars in its orbit, swinging between freezing and scorching every few months.",
+        bestAnswer: true
       },
       {
-        id: "5-7",
+        id: "5-6",
         name: "Ashveil",
         type: "Terrestrial",
         temperature: 44,
@@ -523,7 +520,35 @@ export const levels = [
         bestAnswer: false
       },
       {
+        id: "5-7",
+        name: "Thornvast",
+        type: "Volcanic",
+        temperature: 280,
+        waterCoverage: 0,
+        atmosphere: "Sulfur Dioxide",
+        atmosphereThickness: "Very Thick",
+        mass: 3.1,
+        weather: "Extreme",
+        ozoneLayer: false,
+        description: "A volcanic nightmare world constantly reshaped by eruptions triggered by the binary stars' tidal forces.",
+        bestAnswer: false
+      },
+      {
         id: "5-8",
+        name: "Vortaxis",
+        type: "Gas Giant",
+        temperature: -80,
+        waterCoverage: null,
+        atmosphere: "Hydrogen-Helium",
+        atmosphereThickness: "Extreme",
+        mass: 25.0,
+        weather: "Extreme",
+        ozoneLayer: false,
+        description: "A massive gas giant with a swirling storm the size of a continent that has lasted for centuries.",
+        bestAnswer: false
+      },
+      {
+        id: "5-9",
         name: "Meteor Chunk I",
         type: "Meteor",
         size: "Large",
@@ -535,20 +560,6 @@ export const levels = [
         weather: null,
         ozoneLayer: false,
         description: "A moon-sized rock being torn apart by the gravitational pull of both stars.",
-        bestAnswer: false
-      },
-      {
-        id: "5-9",
-        name: "Thornvast",
-        type: "Volcanic",
-        temperature: 280,
-        waterCoverage: 0,
-        atmosphere: "Sulfur Dioxide",
-        atmosphereThickness: "Very Thick",
-        mass: 3.1,
-        weather: "Extreme",
-        ozoneLayer: false,
-        description: "A volcanic nightmare world constantly reshaped by eruptions triggered by the binary stars' tidal forces.",
         bestAnswer: false
       }
     ]
