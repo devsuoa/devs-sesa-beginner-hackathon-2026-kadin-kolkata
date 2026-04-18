@@ -1,5 +1,5 @@
 //rarh
-function drawPlanetCanvas(c2d, artKey, sz) {
+export function drawPlanetCanvas(c2d, artKey, sz) {
   const r = sz;
   c2d.clearRect(0, 0, r * 2, r * 2);
   const cx2 = r, cy2 = r;
