@@ -6,14 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
-      --bg: #020617;
       --accent: #38bdf8;
-      --accent-soft: rgba(56, 189, 248, 0.2);
       --text-main: #e5e7eb;
       --text-muted: #9ca3af;
       --star: #facc15;
-      --btn-bg: #0f172a;
-      --btn-hover: #1e293b;
       --zoom-in: 4.25;
       --zoom-duration: 1.45s;
       --zoom-ease: cubic-bezier(0.45, 0, 0.15, 1);
@@ -269,76 +265,6 @@
       opacity: 1;
     }
 
-    .dock {
-      position: absolute;
-      opacity: 0;
-      transform: translateY(12px);
-      pointer-events: none;
-      transition:
-        opacity calc(var(--zoom-duration) * 0.45) ease 0.1s,
-        transform calc(var(--zoom-duration) * 0.55) var(--zoom-ease) 0.1s;
-      z-index: 20;
-      bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
-      left: 50%;
-      transform: translateX(-50%) translateY(12px);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.65rem;
-      justify-content: center;
-      max-width: min(94vw, 32rem);
-      padding-inline: 0.75rem;
-    }
-
-    .viewport.is-zoomed-out .dock {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-      pointer-events: auto;
-    }
-
-    .btn-primary {
-      position: relative;
-      padding: 0.75rem 1.35rem;
-      border-radius: 999px;
-      border: 1px solid var(--accent-soft);
-      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.3), transparent),
-                  var(--btn-bg);
-      color: var(--text-main);
-      font-weight: 600;
-      font-size: 0.8rem;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-      box-shadow: 0 0 20px rgba(15, 23, 42, 0.9);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.45), transparent),
-                  var(--btn-hover);
-      box-shadow: 0 0 28px rgba(56, 189, 248, 0.3);
-    }
-
-    .btn-secondary {
-      padding: 0.75rem 1.1rem;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.45);
-      background: rgba(15, 23, 42, 0.75);
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-    }
-
-    .btn-secondary:hover {
-      background: rgba(15, 23, 42, 0.95);
-      color: var(--text-main);
-      border-color: rgba(148, 163, 184, 0.8);
-    }
-
     @keyframes starPulse {
       0%, 100% {
         box-shadow:
@@ -364,7 +290,6 @@
         transition-duration: 0.01ms;
       }
       .landing,
-      .dock,
       .zoom-hint {
         transition-duration: 0.01ms;
       }
@@ -407,18 +332,11 @@
     </div>
 
     <p class="zoom-hint" id="zoomHint">Solar system view — click the sun to zoom back in</p>
-
-    <div class="dock">
-      <button type="button" class="btn-primary" id="playButton">Start Orbit</button>
-      <button type="button" class="btn-secondary" id="howToButton">How to play</button>
-    </div>
   </div>
 
   <script>
     const viewport = document.getElementById('viewport');
     const sun = document.getElementById('sun');
-    const playButton = document.getElementById('playButton');
-    const howToButton = document.getElementById('howToButton');
 
     function setZoomedOut(on) {
       viewport.classList.toggle('is-zoomed-out', on);
@@ -430,15 +348,6 @@
 
     sun.addEventListener('click', () => {
       setZoomedOut(!viewport.classList.contains('is-zoomed-out'));
-    });
-
-    playButton.addEventListener('click', () => {
-      setZoomedOut(true);
-      console.log('Start Orbit → system view');
-    });
-
-    howToButton.addEventListener('click', () => {
-      console.log('How to Play → show tutorial (TODO)');
     });
   </script>
 </body>
