@@ -5,24 +5,24 @@
   <title>Re-Plan-It | Find the Perfect Alien Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
     :root {
       --accent: #38bdf8;
+      --accent2: #f97316;
+      --accent3: #22c55e;
       --text-main: #e5e7eb;
       --text-muted: #9ca3af;
       --star: #facc15;
-      --zoom-in: 4.25;
+      --zoom-in: 3.5;
       --zoom-duration: 1.45s;
       --zoom-ease: cubic-bezier(0.45, 0, 0.15, 1);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       background: radial-gradient(circle at top, #0b1120 0, #020617 55%, #000 100%);
       color: var(--text-main);
       min-height: 100vh;
@@ -30,448 +30,972 @@
     }
 
     .stars {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
+      position: fixed; inset: 0; pointer-events: none;
       background-image:
-        radial-gradient(2px 2px at 20% 30%, rgba(248, 250, 252, 0.55), transparent),
-        radial-gradient(1.5px 1.5px at 80% 70%, rgba(248, 250, 252, 0.35), transparent),
-        radial-gradient(1.5px 1.5px at 60% 20%, rgba(248, 250, 252, 0.45), transparent),
-        radial-gradient(2px 2px at 10% 80%, rgba(248, 250, 252, 0.45), transparent),
-        radial-gradient(1px 1px at 40% 60%, rgba(248, 250, 252, 0.5), transparent);
-      opacity: 0.75;
-      z-index: 0;
+        radial-gradient(2px 2px at 20% 30%, rgba(248,250,252,.55), transparent),
+        radial-gradient(1.5px 1.5px at 80% 70%, rgba(248,250,252,.35), transparent),
+        radial-gradient(1.5px 1.5px at 60% 20%, rgba(248,250,252,.45), transparent),
+        radial-gradient(2px 2px at 10% 80%, rgba(248,250,252,.45), transparent),
+        radial-gradient(1px 1px at 40% 60%, rgba(248,250,252,.5), transparent),
+        radial-gradient(1px 1px at 90% 15%, rgba(248,250,252,.4), transparent),
+        radial-gradient(1.5px 1.5px at 35% 85%, rgba(248,250,252,.3), transparent),
+        radial-gradient(2px 2px at 70% 45%, rgba(248,250,252,.35), transparent),
+        radial-gradient(1px 1px at 55% 55%, rgba(248,250,252,.5), transparent),
+        radial-gradient(1px 1px at 25% 10%, rgba(248,250,252,.4), transparent);
+      opacity: .75; z-index: 0;
     }
 
-    .viewport {
-      position: relative;
-      z-index: 1;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    #fadeOverlay {
+      position: fixed; inset: 0; background: #000;
+      opacity: 0; pointer-events: none; z-index: 200;
+      transition: opacity 0.9s ease;
     }
+    #fadeOverlay.fade-in { opacity: 1; pointer-events: all; }
 
-    /* Left: planet dossier (opens when a planet is selected in system view) */
+    #systemSplash {
+      position: fixed; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; z-index: 201;
+      opacity: 0; pointer-events: none; transition: opacity 0.7s ease;
+      gap: 0.5rem;
+    }
+    #systemSplash.visible { opacity: 1; }
+    #systemSplash .sys-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(0.7rem, 2vw, 0.9rem);
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--accent); opacity: 0.75;
+    }
+    #systemSplash .sys-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.8rem, 6vw, 3.2rem);
+      font-weight: 900; letter-spacing: 0.12em;
+      color: #f8fafc; text-shadow: 0 0 60px rgba(56,189,248,0.5);
+    }
+    #systemSplash .sys-level {
+      font-size: 0.8rem; color: var(--text-muted); letter-spacing: 0.2em;
+      margin-top: 0.25rem;
+    }
+    #systemSplash .sys-hint {
+      margin-top: 1.5rem; font-size: 0.78rem; color: rgba(156,163,175,0.7);
+      letter-spacing: 0.06em; animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+
+    #levelHud {
+      position: fixed; top: max(1rem, env(safe-area-inset-top,0px));
+      right: 1.25rem; z-index: 50;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem;
+      opacity: 0; transition: opacity 0.5s ease;
+    }
+    #levelHud.visible { opacity: 1; }
+    .hud-level {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.65rem; letter-spacing: 0.25em; color: var(--accent);
+      text-transform: uppercase;
+    }
+    .hud-dots { display: flex; gap: 0.4rem; }
+    .hud-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 1.5px solid rgba(148,163,184,0.4);
+      background: transparent;
+      transition: all 0.4s ease;
+    }
+    .hud-dot.done { background: var(--accent3); border-color: var(--accent3); box-shadow: 0 0 8px rgba(34,197,94,0.6); }
+    .hud-dot.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 8px rgba(56,189,248,0.6); }
+
     .planet-panel {
-      position: fixed;
-      z-index: 40;
-      left: 0;
-      top: 0;
-      height: 100%;
-      width: min(22rem, calc(100vw - 1.25rem));
-      max-height: 100dvh;
+      position: fixed; z-index: 40; left: 0; top: 0; height: 100%;
+      width: min(22rem, calc(100vw - 1.25rem)); max-height: 100dvh;
       padding: 1rem 1.15rem;
-      padding-top: max(1rem, env(safe-area-inset-top, 0px));
-      padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
-      background: rgba(15, 23, 42, 0.94);
-      border-right: 1px solid rgba(148, 163, 184, 0.28);
-      box-shadow: 8px 0 32px rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(12px);
-      transform: translateX(-100%);
-      visibility: hidden;
-      transition:
-        transform 0.38s var(--zoom-ease),
-        visibility 0s linear 0.38s;
-      overflow-y: auto;
-      pointer-events: none;
+      padding-top: max(1rem, env(safe-area-inset-top,0px));
+      padding-bottom: max(1rem, env(safe-area-inset-bottom,0px));
+      background: rgba(10,18,38,0.96);
+      border-right: 1px solid rgba(148,163,184,0.22);
+      box-shadow: 8px 0 32px rgba(0,0,0,.5);
+      backdrop-filter: blur(14px);
+      transform: translateX(-100%); visibility: hidden;
+      transition: transform 0.38s var(--zoom-ease), visibility 0s linear 0.38s;
+      overflow-y: auto; pointer-events: none;
     }
-
     .planet-panel.planet-panel--open {
-      transform: translateX(0);
-      visibility: visible;
+      transform: translateX(0); visibility: visible;
       transition: transform 0.38s var(--zoom-ease);
       pointer-events: auto;
     }
-
     .planet-panel__header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 0.75rem;
-      margin-bottom: 0.5rem;
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: .75rem; margin-bottom: .5rem;
     }
-
     .planet-panel__title {
-      font-size: 1.35rem;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      line-height: 1.25;
-      color: #f8fafc;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem; font-weight: 700; letter-spacing: .04em;
+      line-height: 1.3; color: #f8fafc;
     }
-
     .planet-panel__close {
-      flex-shrink: 0;
-      width: 2rem;
-      height: 2rem;
-      border-radius: 0.5rem;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      background: rgba(30, 41, 59, 0.9);
-      color: var(--text-muted);
-      font-size: 1.25rem;
-      line-height: 1;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+      flex-shrink: 0; width: 2rem; height: 2rem; border-radius: .5rem;
+      border: 1px solid rgba(148,163,184,.35); background: rgba(30,41,59,.9);
+      color: var(--text-muted); font-size: 1.25rem; line-height: 1; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: color .15s, background .15s, border-color .15s;
     }
-
-    .planet-panel__close:hover {
-      color: var(--text-main);
-      background: rgba(51, 65, 85, 0.95);
-      border-color: rgba(148, 163, 184, 0.55);
-    }
-
-    .planet-panel__meta {
-      font-size: 0.8rem;
-      color: var(--accent);
-      letter-spacing: 0.04em;
-      margin-bottom: 1rem;
-    }
-
-    .planet-panel__desc {
-      font-size: 0.95rem;
-      line-height: 1.55;
-      color: var(--text-main);
-      margin-bottom: 1.25rem;
-    }
-
-    .planet-panel__stats {
-      display: flex;
-      flex-direction: column;
-      gap: 0.65rem;
-    }
-
+    .planet-panel__close:hover { color: var(--text-main); background: rgba(51,65,85,.95); border-color: rgba(148,163,184,.55); }
+    .planet-panel__meta { font-size: .78rem; color: var(--accent); letter-spacing: .04em; margin-bottom: .85rem; }
+    .planet-panel__desc { font-size: .88rem; line-height: 1.55; color: var(--text-main); margin-bottom: 1.1rem; }
+    .planet-panel__stats { display: flex; flex-direction: column; gap: .55rem; margin-bottom: 1.25rem; }
     .planet-panel__stat {
-      display: grid;
-      grid-template-columns: 7.5rem 1fr;
-      gap: 0.5rem 0.75rem;
-      font-size: 0.82rem;
-      align-items: baseline;
+      display: grid; grid-template-columns: 7.5rem 1fr;
+      gap: .4rem .65rem; font-size: .8rem; align-items: baseline;
     }
+    .planet-panel__label { color: var(--text-muted); font-weight: 500; }
+    .planet-panel__value { color: #e2e8f0; }
 
-    .planet-panel__label {
-      color: var(--text-muted);
-      font-weight: 500;
+    .btn-choose {
+      width: 100%; padding: .7rem 1rem;
+      background: linear-gradient(135deg, rgba(56,189,248,.18), rgba(56,189,248,.08));
+      border: 1px solid rgba(56,189,248,.55); border-radius: .6rem;
+      color: var(--accent); font-family: 'Orbitron', sans-serif;
+      font-size: .72rem; letter-spacing: .1em; font-weight: 600;
+      cursor: pointer; text-transform: uppercase;
+      transition: all .2s ease; margin-top: .25rem;
     }
-
-    .planet-panel__value {
-      color: #e2e8f0;
+    .btn-choose:hover {
+      background: linear-gradient(135deg, rgba(56,189,248,.3), rgba(56,189,248,.15));
+      border-color: var(--accent); box-shadow: 0 0 20px rgba(56,189,248,.25);
     }
+    .btn-choose:disabled { opacity: .4; cursor: default; }
 
+    .result-wrong {
+      padding: .75rem 1rem; background: rgba(239,68,68,.1);
+      border: 1px solid rgba(239,68,68,.45); border-radius: .6rem;
+      font-size: .83rem; color: #fca5a5; line-height: 1.5; margin-top: .75rem;
+    }
+    .result-wrong strong { color: #f87171; }
+    .result-right {
+      padding: .75rem 1rem; background: rgba(34,197,94,.08);
+      border: 1px solid rgba(34,197,94,.4); border-radius: .6rem;
+      margin-top: .75rem;
+    }
+    .result-right .score-title {
+      font-family: 'Orbitron', sans-serif; font-size: .7rem;
+      letter-spacing: .12em; color: var(--accent3); margin-bottom: .6rem;
+    }
+    .result-right .score-big {
+      font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 900;
+      color: #f8fafc; line-height: 1; margin-bottom: .15rem;
+    }
+    .result-right .score-sub { font-size: .75rem; color: var(--text-muted); margin-bottom: .85rem; }
+    .score-reasons { display: flex; flex-direction: column; gap: .45rem; }
+    .score-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: .78rem; gap: .5rem;
+    }
+    .score-row-label { color: var(--text-muted); flex: 1; }
+    .score-bar-wrap { width: 60px; height: 5px; background: rgba(148,163,184,.15); border-radius: 3px; overflow: hidden; }
+    .score-bar { height: 100%; border-radius: 3px; transition: width .8s ease .2s; }
+    .score-bar.great { background: var(--accent3); }
+    .score-bar.ok { background: var(--star); }
+    .score-bar.bad { background: #ef4444; }
+    .score-val { font-size: .72rem; font-weight: 600; min-width: 2.2rem; text-align: right; }
+    .score-val.great { color: var(--accent3); }
+    .score-val.ok { color: var(--star); }
+    .score-val.bad { color: #ef4444; }
+    .btn-next {
+      margin-top: 1rem; width: 100%; padding: .7rem 1rem;
+      background: linear-gradient(135deg, rgba(34,197,94,.2), rgba(34,197,94,.1));
+      border: 1px solid rgba(34,197,94,.5); border-radius: .6rem;
+      color: var(--accent3); font-family: 'Orbitron', sans-serif;
+      font-size: .7rem; letter-spacing: .1em; font-weight: 700;
+      cursor: pointer; text-transform: uppercase; transition: all .2s ease;
+    }
+    .btn-next:hover { box-shadow: 0 0 20px rgba(34,197,94,.25); }
+
+    /* ── Viewport & system ── */
+    .viewport {
+      position: relative; z-index: 1;
+      width: 100vw; height: 100vh; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
     .system-wrap {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: relative; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
       transform: scale(var(--zoom-in));
       transform-origin: center center;
       transition: transform var(--zoom-duration) var(--zoom-ease);
       will-change: transform;
     }
+    .viewport.is-zoomed-out .system-wrap { transform: scale(1); }
 
-    .viewport.is-zoomed-out .system-wrap {
-      transform: scale(1);
-    }
-
-    /* Solar system canvas (logical size); scaling happens on .system-wrap */
     .system {
       position: relative;
-      width: min(92vmin, 560px);
-      height: min(92vmin, 560px);
+      width: min(98vmin, 900px); height: min(98vmin, 900px);
       aspect-ratio: 1 / 1;
     }
 
+    /* ── Sun ── */
     .sun {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 72px;
-      height: 72px;
-      margin-left: -36px;
-      margin-top: -36px;
-      border: none;
-      padding: 0;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 20%, #fef9c3, #facc15, #b45309);
-      box-shadow:
-        0 0 36px rgba(250, 204, 21, 0.95),
-        0 0 72px rgba(251, 191, 36, 0.65),
-        0 0 120px rgba(251, 146, 60, 0.25);
-      cursor: pointer;
-      z-index: 10;
+      position: absolute; left: 50%; top: 50%;
+      width: 110px; height: 110px; margin-left: -55px; margin-top: -55px;
+      border: none; padding: 0; border-radius: 50%;
+      cursor: pointer; z-index: 10;
+      transition: transform .25s ease, box-shadow .25s ease;
       animation: starPulse 4s ease-in-out infinite;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .sun:hover { transform: scale(1.05); }
+    .sun:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+    .sun[data-level="1"] {
+      background: radial-gradient(circle at 30% 20%, #fef9c3, #facc15, #b45309);
+      box-shadow: 0 0 55px rgba(250,204,21,.95), 0 0 110px rgba(251,191,36,.65), 0 0 180px rgba(251,146,60,.2);
+    }
+    .sun[data-level="2"] {
+      background: radial-gradient(circle at 35% 25%, #fed7aa, #f97316, #7c2d12);
+      box-shadow: 0 0 55px rgba(249,115,22,.9), 0 0 110px rgba(234,88,12,.6), 0 0 180px rgba(154,52,18,.25);
+    }
+    .sun[data-level="3"] {
+      background: radial-gradient(circle at 30% 30%, #fecaca, #ef4444, #7f1d1d);
+      box-shadow: 0 0 55px rgba(239,68,68,.9), 0 0 110px rgba(220,38,38,.6), 0 0 180px rgba(127,29,29,.3);
+    }
+    .sun[data-level="4"] {
+      background: radial-gradient(circle at 25% 25%, #e0e7ff, #818cf8, #3730a3);
+      box-shadow: 0 0 55px rgba(129,140,248,.9), 0 0 110px rgba(99,102,241,.65), 0 0 180px rgba(55,48,163,.3);
+    }
+    .sun[data-level="5"] {
+      background: radial-gradient(circle at 30% 20%, #d1fae5, #34d399, #065f46);
+      box-shadow: 0 0 55px rgba(52,211,153,.9), 0 0 110px rgba(16,185,129,.65), 0 0 180px rgba(6,78,59,.3);
     }
 
-    .sun:hover {
-      transform: scale(1.05);
-      box-shadow:
-        0 0 48px rgba(250, 204, 21, 1),
-        0 0 90px rgba(251, 191, 36, 0.85),
-        0 0 140px rgba(251, 146, 60, 0.35);
+    /* ── Orbit SVG rings (static, purely decorative) ── */
+    #orbitSvg {
+      position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none; z-index: 1;
+      opacity: 0; transition: opacity calc(var(--zoom-duration) * .55) var(--zoom-ease);
+      overflow: visible;
     }
+    .viewport.is-zoomed-out #orbitSvg { opacity: 1; }
 
-    .sun:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 4px;
-    }
-
-    .orbit {
+    /* ── Planet wrappers — positioned by JS each frame ── */
+    .planet-wrap {
       position: absolute;
-      left: 50%;
-      top: 50%;
-      border-radius: 50%;
-      border: 1px dashed rgba(203, 213, 225, 0.45);
-      transform-origin: 50% 50%;
+      transform: translate(-50%, -50%);
       pointer-events: none;
-      z-index: 1;
-      opacity: 0;
-      transition: opacity calc(var(--zoom-duration) * 0.55) var(--zoom-ease);
+      z-index: 2;
     }
-
-    .viewport.is-zoomed-out .orbit {
-      opacity: 1;
-    }
-
-    /* Center of each ring = center of .system: top-left at 50%/50% then pulled back by half size */
-    .orbit--1 {
-      width: 120px;
-      height: 120px;
-      margin-left: -60px;
-      margin-top: -60px;
-      animation: orbitRotate 14s linear infinite;
-    }
-
-    .orbit--2 {
-      width: 178px;
-      height: 178px;
-      margin-left: -89px;
-      margin-top: -89px;
-      animation: orbitRotate 22s linear infinite reverse;
-    }
-
-    .orbit--3 {
-      width: 238px;
-      height: 238px;
-      margin-left: -119px;
-      margin-top: -119px;
-      animation: orbitRotate 32s linear infinite;
-    }
-
-    .orbit--4 {
-      width: 310px;
-      height: 310px;
-      margin-left: -155px;
-      margin-top: -155px;
-      animation: orbitRotate 44s linear infinite reverse;
-    }
-
-    .orbit--5 {
-      width: 390px;
-      height: 390px;
-      margin-left: -195px;
-      margin-top: -195px;
-      animation: orbitRotate 58s linear infinite;
-      border-color: rgba(186, 198, 216, 0.32);
-    }
+    .viewport.is-zoomed-out .planet-wrap { pointer-events: auto; cursor: pointer; }
 
     .planet {
-      position: absolute;
-      top: 50%;
-      left: 100%;
-      transform: translate(-50%, -50%);
       border-radius: 50%;
-      box-shadow: 0 0 10px rgba(15, 23, 42, 0.95);
-      pointer-events: none;
-      outline: none;
-      transition: box-shadow 0.2s ease, transform 0.2s ease;
+      overflow: hidden;
+      pointer-events: none; outline: none;
+      transition: box-shadow .2s ease, transform .2s ease;
+      display: block;
     }
-
-    .viewport.is-zoomed-out .planet {
-      pointer-events: auto;
-      cursor: pointer;
-    }
-
+    .viewport.is-zoomed-out .planet { pointer-events: auto; cursor: pointer; }
     .planet.planet--selected {
-      box-shadow:
-        0 0 0 2px rgba(56, 189, 248, 0.95),
-        0 0 14px rgba(15, 23, 42, 0.95);
-      transform: translate(-50%, -50%) scale(1.12);
+      box-shadow: 0 0 0 2px rgba(56,189,248,.95), 0 0 18px rgba(56,189,248,.4);
+      transform: scale(1.15);
     }
 
-    .landing {
+    /* ── Landing — repositioned ── */
+    /*
+      Title floats above the sun (which is at centre). In zoom-in mode the
+      system-wrap is scaled up ~3.5x, so the sun fills most of the screen.
+      We position the title above centre and the subtitle below centre using
+      fixed positioning so they sit outside the scaled system-wrap.
+    */
+    .landing-top {
       position: absolute;
-      left: 50%;
-      top: 52%;
-      transform: translate(-50%, calc(-50% - min(22vmin, 130px)));
-      text-align: center;
-      z-index: 5;
-      pointer-events: none;
-      width: min(92vw, 28rem);
-      transition:
-        opacity calc(var(--zoom-duration) * 0.55) ease,
-        transform calc(var(--zoom-duration) * 0.85) var(--zoom-ease);
+      left: 50%; top: 12%;
+      transform: translateX(-50%);
+      text-align: center; z-index: 5; pointer-events: none;
+      white-space: nowrap;
+      transition: opacity calc(var(--zoom-duration) * .55) ease,
+                  transform calc(var(--zoom-duration) * .85) var(--zoom-ease);
+    }
+    .viewport.is-zoomed-out .landing-top {
+      opacity: 0; pointer-events: none;
+      transform: translateX(-50%) translateY(-20px) scale(.95);
     }
 
-    .viewport.is-zoomed-out .landing {
-      opacity: 0;
-      transform: translate(-50%, calc(-50% - min(34vmin, 200px))) scale(0.92);
-      pointer-events: none;
+    .landing-bottom {
+      position: absolute;
+      left: 50%; bottom: 10%;
+      transform: translateX(-50%);
+      text-align: center; z-index: 5; pointer-events: none;
+      width: min(92vw, 30rem);
+      transition: opacity calc(var(--zoom-duration) * .55) ease,
+                  transform calc(var(--zoom-duration) * .85) var(--zoom-ease);
+    }
+    .viewport.is-zoomed-out .landing-bottom {
+      opacity: 0; pointer-events: none;
+      transform: translateX(-50%) translateY(20px) scale(.95);
     }
 
     .title {
+      font-family: 'Orbitron', sans-serif;
       font-size: clamp(2rem, 7vw, 3.25rem);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-weight: 800;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 0.35rem;
-      text-shadow: 0 0 40px rgba(15, 23, 42, 0.9);
+      letter-spacing: .08em; text-transform: uppercase; font-weight: 900;
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-wrap: wrap; gap: .35rem;
     }
-
     .title span.re { color: var(--accent); }
     .title span.plan { color: #f97316; }
     .title span.it { color: #22c55e; }
 
+    /* Bottom text card — semi-transparent backdrop for legibility */
+    .landing-card {
+      background: rgba(2, 6, 23, 0.72);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 1rem;
+      padding: 1rem 1.4rem 1.15rem;
+    }
     .subtitle {
-      margin-top: 0.65rem;
-      font-size: clamp(0.85rem, 2.4vw, 1rem);
-      color: var(--text-muted);
-      line-height: 1.45;
-      max-width: 24rem;
-      margin-inline: auto;
-      text-shadow: 0 1px 18px rgba(0, 0, 0, 0.85);
+      font-size: clamp(.88rem, 2.4vw, 1rem);
+      color: #cbd5e1;
+      line-height: 1.55;
     }
-
     .tap-hint {
-      margin-top: 1rem;
-      font-size: 0.78rem;
-      color: rgba(156, 163, 175, 0.85);
-      letter-spacing: 0.04em;
+      margin-top: .65rem;
+      font-size: .78rem;
+      color: rgba(156,163,175,.9);
+      letter-spacing: .03em;
     }
-
-    .tap-hint strong {
-      color: var(--star);
-      font-weight: 600;
-    }
+    .tap-hint strong { color: var(--star); font-weight: 600; }
 
     .zoom-hint {
-      position: absolute;
-      bottom: max(1rem, env(safe-area-inset-bottom, 0px));
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      z-index: 20;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.5s ease 0.35s;
-      white-space: nowrap;
+      position: absolute; bottom: max(1rem, env(safe-area-inset-bottom,0px));
+      left: 50%; transform: translateX(-50%);
+      font-size: .75rem; color: var(--text-muted); z-index: 20;
+      opacity: 0; pointer-events: none;
+      transition: opacity .5s ease .35s; white-space: nowrap;
     }
+    .viewport.is-zoomed-out .zoom-hint { opacity: 1; }
 
-    .viewport.is-zoomed-out .zoom-hint {
-      opacity: 1;
+    /* ── Completion screen ── */
+    #completionScreen {
+      position: fixed; inset: 0; z-index: 300;
+      background: radial-gradient(circle at 40% 30%, #0b1e3d 0%, #020617 60%, #000 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 1.2s ease;
+      text-align: center; padding: 2rem;
+      overflow-y: auto;
     }
+    #completionScreen.visible { opacity: 1; pointer-events: all; }
+    .completion-stars { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .c-star {
+      position: absolute; border-radius: 50%; background: #fff;
+      animation: twinkle 3s ease-in-out infinite;
+    }
+    @keyframes twinkle { 0%,100%{opacity:.2} 50%{opacity:.9} }
+    .completion-badge {
+      font-size: clamp(3rem, 10vw, 5rem); margin-bottom: 1rem;
+      animation: floatBadge 3s ease-in-out infinite;
+    }
+    @keyframes floatBadge { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+    .completion-eyebrow {
+      font-family: 'Orbitron', sans-serif; font-size: .7rem;
+      letter-spacing: .35em; color: var(--accent); margin-bottom: .75rem;
+    }
+    .completion-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 7vw, 4rem); font-weight: 900;
+      letter-spacing: .06em; color: #f8fafc;
+      text-shadow: 0 0 80px rgba(56,189,248,.4);
+      margin-bottom: .5rem; line-height: 1.1;
+    }
+    .completion-sub {
+      font-size: clamp(.9rem, 2.5vw, 1.1rem); color: var(--text-muted);
+      max-width: 26rem; line-height: 1.6; margin-bottom: 2rem;
+    }
+    .completion-medals {
+      display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .c-medal {
+      display: flex; flex-direction: column; align-items: center; gap: .4rem;
+      padding: 1rem 1.25rem;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+      border-radius: .75rem; min-width: 5.5rem;
+    }
+    .c-medal .m-planet { font-size: 1.5rem; margin-bottom: .25rem; }
+    .c-medal .m-name { font-family: 'Orbitron', sans-serif; font-size: .6rem; letter-spacing: .1em; color: var(--accent); }
+    .c-medal .m-score { font-size: 1.1rem; font-weight: 700; color: #f8fafc; }
+    .btn-restart {
+      padding: .85rem 2.5rem;
+      background: linear-gradient(135deg, rgba(56,189,248,.2), rgba(56,189,248,.08));
+      border: 1px solid rgba(56,189,248,.55); border-radius: .75rem;
+      color: var(--accent); font-family: 'Orbitron', sans-serif;
+      font-size: .75rem; letter-spacing: .15em; font-weight: 700;
+      cursor: pointer; text-transform: uppercase;
+      transition: all .2s ease;
+    }
+    .btn-restart:hover { box-shadow: 0 0 30px rgba(56,189,248,.3); transform: translateY(-2px); }
 
     @keyframes starPulse {
-      0%, 100% {
-        box-shadow:
-          0 0 36px rgba(250, 204, 21, 0.95),
-          0 0 72px rgba(251, 191, 36, 0.65),
-          0 0 120px rgba(251, 146, 60, 0.25);
-      }
-      50% {
-        box-shadow:
-          0 0 48px rgba(250, 204, 21, 1),
-          0 0 96px rgba(251, 191, 36, 0.8),
-          0 0 150px rgba(251, 146, 60, 0.35);
-      }
+      0%,100% { filter: brightness(1); }
+      50% { filter: brightness(1.15); }
     }
-
-    @keyframes orbitRotate {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
+    @keyframes orbitRotate { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 
     @media (prefers-reduced-motion: reduce) {
-      .system-wrap {
-        transition-duration: 0.01ms;
-      }
-      .landing,
-      .zoom-hint,
-      .planet-panel {
-        transition-duration: 0.01ms;
-      }
-      .orbit {
-        transition-duration: 0.01ms;
-      }
-      .orbit,
-      .sun {
-        animation: none;
-      }
-      .planet {
-        transition-duration: 0.01ms;
-      }
+      .system-wrap, .landing-top, .landing-bottom, .zoom-hint, .planet-panel, .orbit, .planet { transition-duration: .01ms; }
+      .orbit, .sun, .planet-counter { animation: none; }
     }
   </style>
 </head>
 <body>
-  <div class="stars" aria-hidden="true"></div>
+<div class="stars" aria-hidden="true"></div>
+<div id="fadeOverlay"></div>
+<div id="systemSplash">
+  <div class="sys-label">Entering System</div>
+  <div class="sys-name" id="splashName"></div>
+  <div class="sys-level" id="splashLevel"></div>
+  <div class="sys-hint">Click the star to explore</div>
+</div>
 
-  <div class="viewport" id="viewport">
-    <aside
-      class="planet-panel"
-      id="planetPanel"
-      aria-hidden="true"
-      aria-labelledby="planetPanelTitle"
-    >
-      <div class="planet-panel__header">
-        <h2 class="planet-panel__title" id="planetPanelTitle"></h2>
-        <button type="button" class="planet-panel__close" id="planetPanelClose" aria-label="Close planet details">
-          ×
-        </button>
-      </div>
-      <p class="planet-panel__meta" id="planetPanelMeta"></p>
-      <p class="planet-panel__desc" id="planetPanelDesc"></p>
-      <div class="planet-panel__stats" id="planetPanelStats"></div>
-    </aside>
+<div id="levelHud">
+  <div class="hud-level" id="hudLabel">Level 1 of 5</div>
+  <div class="hud-dots" id="hudDots"></div>
+</div>
 
-    <div class="landing">
-      <div class="title">
-        <span class="re">RE-</span>
-        <span class="plan">PLAN</span>
-        <span class="it">-IT</span>
-      </div>
-      <p class="subtitle">
-        Find the perfect alien home — click the star to pull back and see the whole system.
-      </p>
-      <p class="tap-hint"><strong>Tip:</strong> Click the star again to return to the landing view.</p>
+<div class="viewport" id="viewport">
+  <aside class="planet-panel" id="planetPanel" aria-hidden="true" aria-labelledby="planetPanelTitle">
+    <div class="planet-panel__header">
+      <h2 class="planet-panel__title" id="planetPanelTitle"></h2>
+      <button type="button" class="planet-panel__close" id="planetPanelClose" aria-label="Close planet details">×</button>
     </div>
+    <p class="planet-panel__meta" id="planetPanelMeta"></p>
+    <p class="planet-panel__desc" id="planetPanelDesc"></p>
+    <div class="planet-panel__stats" id="planetPanelStats"></div>
+    <button class="btn-choose" id="btnChoose">Choose This Planet</button>
+    <div id="choiceResult"></div>
+  </aside>
 
-    <div class="system-wrap" id="systemWrap">
-      <div class="system" aria-hidden="true">
-        <button type="button" class="sun" id="sun" aria-label="Zoom: show full star system"></button>
-
-        <div class="orbit orbit--1"><div class="planet"></div></div>
-        <div class="orbit orbit--2"><div class="planet"></div></div>
-        <div class="orbit orbit--3"><div class="planet"></div></div>
-        <div class="orbit orbit--4"><div class="planet"></div></div>
-        <div class="orbit orbit--5"><div class="planet"></div></div>
-      </div>
+  <!-- Title above star -->
+  <div class="landing-top" id="landingTop">
+    <div class="title">
+      <span class="re">RE-</span>
+      <span class="plan">PLAN</span>
+      <span class="it">-IT</span>
     </div>
-
-    <p class="zoom-hint" id="zoomHint">Solar system view — click the sun to zoom back in</p>
   </div>
 
-  <script type="module" src="/src/data/landing-page.ts"></script>
+  <!-- Info below star -->
+  <div class="landing-bottom" id="landingBottom">
+    <div class="landing-card">
+      <p class="subtitle" id="landingSubtitle">Find the perfect alien home — click the star to pull back and see the whole system.</p>
+      <p class="tap-hint"><strong>Tip:</strong> Click the star again to return to this view.</p>
+    </div>
+  </div>
+
+  <div class="system-wrap" id="systemWrap">
+    <div class="system" id="systemEl" aria-hidden="true">
+      <button type="button" class="sun" id="sun" data-level="1" aria-label="Zoom: show full star system"></button>
+
+      <!-- Static SVG orbit rings — circles drawn at exact orbital radii.
+           Radii in px match the JS orbit config below (max values). -->
+      <svg id="orbitSvg" width="0" height="0" aria-hidden="true">
+        <circle id="orbitRing1" cx="0" cy="0" fill="none" stroke="rgba(203,213,225,0.4)" stroke-width="1" stroke-dasharray="4 6"/>
+        <circle id="orbitRing2" cx="0" cy="0" fill="none" stroke="rgba(203,213,225,0.4)" stroke-width="1" stroke-dasharray="4 6"/>
+        <circle id="orbitRing3" cx="0" cy="0" fill="none" stroke="rgba(203,213,225,0.4)" stroke-width="1" stroke-dasharray="4 6"/>
+        <circle id="orbitRing4" cx="0" cy="0" fill="none" stroke="rgba(203,213,225,0.4)" stroke-width="1" stroke-dasharray="4 6"/>
+        <circle id="orbitRing5" cx="0" cy="0" fill="none" stroke="rgba(186,198,216,0.28)" stroke-width="1" stroke-dasharray="4 6"/>
+      </svg>
+
+      <!-- Planet wrappers — JS positions these each frame via left/top -->
+      <div class="planet-wrap" id="pw1"><div class="planet" id="p1"></div></div>
+      <div class="planet-wrap" id="pw2"><div class="planet" id="p2"></div></div>
+      <div class="planet-wrap" id="pw3"><div class="planet" id="p3"></div></div>
+      <div class="planet-wrap" id="pw4"><div class="planet" id="p4"></div></div>
+      <div class="planet-wrap" id="pw5"><div class="planet" id="p5"></div></div>
+    </div>
+  </div>
+
+  <p class="zoom-hint" id="zoomHint">Solar system view — click the star to zoom back in</p>
+</div>
+
+<div id="completionScreen">
+  <div class="completion-stars" id="completionStars"></div>
+  <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center;">
+    <div class="completion-badge">🌍</div>
+    <div class="completion-eyebrow">Mission Accomplished</div>
+    <div class="completion-title">New Homes Found</div>
+    <p class="completion-sub">You've successfully guided humanity across 5 star systems and found habitable planets for each colony. The species lives on.</p>
+    <div class="completion-medals" id="completionMedals"></div>
+    <button class="btn-restart" id="btnRestart">Play Again</button>
+  </div>
+</div>
+
+<script>
+const LEVELS = [
+  {
+    level: 1, systemName: "Sol Secundus", starColor: 1,
+    mission: "A yellow dwarf star system. Find a world that can support liquid water and breathable air.",
+    planets: [
+      { id: "p1", name: "Cinder", type: "Rocky • Inner", desc: "A scorched rock far too close to the star. Temperatures routinely exceed 450°C. No atmosphere to speak of.", stats: { "Surface Temp": "450°C", "Atmosphere": "None", "Water": "None", "Gravity": "0.38g", "Day Length": "58 Earth days" }, best: false, reasons: [{ label: "Temperature", val: 5, note: "Far too hot" }, { label: "Atmosphere", val: 0, note: "None detected" }, { label: "Water", val: 0, note: "Vaporised" }, { label: "Gravity", val: 40, note: "Too low" }, { label: "Radiation", val: 10, note: "Extreme" }] },
+      { id: "p2", name: "Verdana", type: "Terrestrial • Habitable Zone", desc: "A lush blue-green world sitting comfortably in the habitable zone. Dense oxygen-nitrogen atmosphere, liquid oceans, and stable seasons.", stats: { "Surface Temp": "14°C avg", "Atmosphere": "N₂/O₂ mix", "Water": "71% surface", "Gravity": "1.05g", "Day Length": "26 Earth hours" }, best: true, reasons: [{ label: "Temperature", val: 95, note: "Near-ideal" }, { label: "Atmosphere", val: 98, note: "Breathable" }, { label: "Water", val: 92, note: "Abundant liquid" }, { label: "Gravity", val: 96, note: "Comfortable" }, { label: "Radiation", val: 88, note: "Protected" }] },
+      { id: "p3", name: "Dustfall", type: "Desert • Outer Zone", desc: "A cold, arid world with a thin CO₂ atmosphere. Dust storms last months. Underground ice detected.", stats: { "Surface Temp": "-55°C avg", "Atmosphere": "Thin CO₂", "Water": "Subsurface ice", "Gravity": "0.72g", "Day Length": "24.6 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 30, note: "Too cold" }, { label: "Atmosphere", val: 18, note: "Not breathable" }, { label: "Water", val: 25, note: "Only ice" }, { label: "Gravity", val: 72, note: "Manageable" }, { label: "Radiation", val: 40, note: "High" }] },
+      { id: "p4", name: "Gassian", type: "Gas Giant", desc: "A massive gas giant with swirling ammonia clouds. No solid surface. 200+ km/h winds.", stats: { "Surface Temp": "-120°C cloud tops", "Atmosphere": "H₂/He", "Water": "None accessible", "Gravity": "2.6g", "Day Length": "10 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 8, note: "Extreme cold/pressure" }, { label: "Atmosphere", val: 2, note: "No oxygen" }, { label: "Water", val: 5, note: "Inaccessible" }, { label: "Gravity", val: 10, note: "Crushing" }, { label: "Radiation", val: 20, note: "High belts" }] },
+      { id: "p5", name: "Rimstone", type: "Ice Giant • Far Orbit", desc: "A frigid ice world on the outer rim. Methane ice caps cover everything. Barely any solar energy reaches here.", stats: { "Surface Temp": "-200°C", "Atmosphere": "CH₄/N₂", "Water": "Frozen solid", "Gravity": "1.1g", "Day Length": "17 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 2, note: "Near absolute zero" }, { label: "Atmosphere", val: 10, note: "Toxic methane" }, { label: "Water", val: 15, note: "All frozen" }, { label: "Gravity", val: 80, note: "Adequate" }, { label: "Radiation", val: 65, note: "Low" }] }
+    ]
+  },
+  {
+    level: 2, systemName: "Pyraxis Drift", starColor: 2,
+    mission: "An orange K-type star. Find a stable, warm world — the star is dimmer so the habitable zone is closer in.",
+    planets: [
+      { id: "p1", name: "Scoria", type: "Volcanic • Inner", desc: "Relentless volcanic activity resurfaces this world every century. Sulfuric acid rain. No stable land.", stats: { "Surface Temp": "380°C", "Atmosphere": "SO₂/CO₂", "Water": "None", "Gravity": "0.92g", "Day Length": "243 Earth days" }, best: false, reasons: [{ label: "Temperature", val: 5, note: "Volcanic hellscape" }, { label: "Atmosphere", val: 2, note: "Toxic acid clouds" }, { label: "Water", val: 0, note: "Evaporated" }, { label: "Gravity", val: 82, note: "Near Earth" }, { label: "Radiation", val: 12, note: "High" }] },
+      { id: "p2", name: "Havenport", type: "Terrestrial • Habitable Zone", desc: "Warm coastal plains, a thick protective magnetosphere, and vast shallow seas make this world a near-perfect refuge.", stats: { "Surface Temp": "22°C avg", "Atmosphere": "N₂/O₂/Ar", "Water": "62% surface", "Gravity": "0.98g", "Day Length": "29 Earth hours" }, best: true, reasons: [{ label: "Temperature", val: 92, note: "Warm, stable" }, { label: "Atmosphere", val: 96, note: "Fully breathable" }, { label: "Water", val: 88, note: "Shallow seas" }, { label: "Gravity", val: 97, note: "Nearly identical" }, { label: "Radiation", val: 91, note: "Strong magnetosphere" }] },
+      { id: "p3", name: "Thalwick", type: "Ocean World", desc: "Entirely covered in a global ocean 80km deep. No land masses. Crushing pressure at depth.", stats: { "Surface Temp": "8°C surface", "Atmosphere": "Humid N₂/O₂", "Water": "100% surface", "Gravity": "1.2g", "Day Length": "31 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 65, note: "Cold but livable" }, { label: "Atmosphere", val: 70, note: "Breathable but humid" }, { label: "Water", val: 50, note: "Too much! No land" }, { label: "Gravity", val: 60, note: "Slightly heavy" }, { label: "Radiation", val: 75, note: "Moderate" }] },
+      { id: "p4", name: "Greyfel", type: "Rocky • Tidally Locked", desc: "One face permanently bakes, the other is permanently frozen. A thin habitable strip exists at the terminator.", stats: { "Surface Temp": "-90°C to 300°C", "Atmosphere": "Thin N₂", "Water": "Terminator rivers", "Gravity": "0.88g", "Day Length": "Tidally locked" }, best: false, reasons: [{ label: "Temperature", val: 35, note: "Extreme range" }, { label: "Atmosphere", val: 30, note: "Too thin" }, { label: "Water", val: 28, note: "Narrow rivers only" }, { label: "Gravity", val: 85, note: "Comfortable" }, { label: "Radiation", val: 22, note: "Exposed side lethal" }] },
+      { id: "p5", name: "Duskward", type: "Super-Earth • Far Zone", desc: "A massive world with intense gravity. Thick hydrogen atmosphere traps greenhouse heat, but the pressure is deadly.", stats: { "Surface Temp": "55°C avg", "Atmosphere": "Dense H₂/He", "Water": "Subsurface lakes", "Gravity": "2.4g", "Day Length": "19 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 40, note: "Too warm" }, { label: "Atmosphere", val: 15, note: "Unbreathable" }, { label: "Water", val: 35, note: "Underground only" }, { label: "Gravity", val: 20, note: "Crushing for humans" }, { label: "Radiation", val: 55, note: "Moderate" }] }
+    ]
+  },
+  {
+    level: 3, systemName: "Rubicant's Eye", starColor: 3,
+    mission: "A red dwarf star. These stars are common but flare frequently. Seek a world with strong shielding.",
+    planets: [
+      { id: "p1", name: "Ashveil", type: "Rocky • Flare-Blasted", desc: "Stripped of its atmosphere by repeated stellar flares. Bare rock under constant X-ray bombardment.", stats: { "Surface Temp": "120°C day / -180°C night", "Atmosphere": "None", "Water": "None", "Gravity": "0.61g", "Day Length": "Tidally locked" }, best: false, reasons: [{ label: "Temperature", val: 8, note: "Extreme swing" }, { label: "Atmosphere", val: 0, note: "Stripped away" }, { label: "Water", val: 0, note: "None" }, { label: "Gravity", val: 55, note: "Low" }, { label: "Radiation", val: 1, note: "Lethal flares" }] },
+      { id: "p2", name: "Miravel", type: "Terrestrial • Deep Magnetosphere", desc: "A compact world with an unusually powerful magnetic field shielding it from flares. Deep red-lit forests, breathable air, and warm springs.", stats: { "Surface Temp": "18°C avg", "Atmosphere": "N₂/O₂", "Water": "48% surface", "Gravity": "0.9g", "Day Length": "62 Earth hours" }, best: true, reasons: [{ label: "Temperature", val: 88, note: "Warm and stable" }, { label: "Atmosphere", val: 90, note: "Breathable" }, { label: "Water", val: 82, note: "Good coverage" }, { label: "Gravity", val: 88, note: "Comfortable" }, { label: "Radiation", val: 85, note: "Strong mag. shield" }] },
+      { id: "p3", name: "Thornwall", type: "Rocky • Outer", desc: "A barren, cold world with a thin argon atmosphere. Occasional methane geysers. Possibly habitable underground.", stats: { "Surface Temp": "-70°C avg", "Atmosphere": "Thin Ar/N₂", "Water": "Subsurface", "Gravity": "0.78g", "Day Length": "30 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 22, note: "Too cold" }, { label: "Atmosphere", val: 20, note: "Not breathable" }, { label: "Water", val: 20, note: "Underground only" }, { label: "Gravity", val: 75, note: "Manageable" }, { label: "Radiation", val: 50, note: "Moderate" }] },
+      { id: "p4", name: "Crestfall", type: "Mini-Neptune • Inner", desc: "A bloated mini-Neptune close to the red dwarf, with hydrogen clouds and no solid surface.", stats: { "Surface Temp": "200°C", "Atmosphere": "H₂/CH₄", "Water": "Atmospheric only", "Gravity": "3.1g", "Day Length": "8 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 10, note: "Too hot" }, { label: "Atmosphere", val: 5, note: "Toxic gas" }, { label: "Water", val: 10, note: "Steam only" }, { label: "Gravity", val: 5, note: "Crushing" }, { label: "Radiation", val: 5, note: "Near star" }] },
+      { id: "p5", name: "Pallowdusk", type: "Icy Moon • Gas Giant", desc: "A moon orbiting a distant gas giant. Subsurface ocean under 30km of ice. No atmosphere, no warmth.", stats: { "Surface Temp": "-180°C", "Atmosphere": "None", "Water": "Under ice", "Gravity": "0.3g", "Day Length": "4 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 3, note: "Frozen solid" }, { label: "Atmosphere", val: 0, note: "Vacuum" }, { label: "Water", val: 30, note: "Buried under ice" }, { label: "Gravity", val: 20, note: "Very low" }, { label: "Radiation", val: 15, note: "Radiation belt" }] }
+    ]
+  },
+  {
+    level: 4, systemName: "Veilwatch Binary", starColor: 4,
+    mission: "A binary system with two stars — one blue-white, one dimmer companion. Orbits are chaotic. Find stability.",
+    planets: [
+      { id: "p1", name: "Solarfract", type: "Chaotic • Inner Crossing", desc: "Its orbit crosses both stars, creating seasons of searing heat followed by deep freeze.", stats: { "Surface Temp": "-120°C to 600°C", "Atmosphere": "Ionised plasma", "Water": "None", "Gravity": "1.1g", "Day Length": "Variable" }, best: false, reasons: [{ label: "Temperature", val: 2, note: "Wildly unstable" }, { label: "Atmosphere", val: 0, note: "Ionised, lethal" }, { label: "Water", val: 0, note: "None" }, { label: "Gravity", val: 75, note: "Fine" }, { label: "Radiation", val: 0, note: "Extreme dual-star" }] },
+      { id: "p2", name: "Calixara", type: "Terrestrial • Stable Lagrange", desc: "Nestled at the stable Lagrange point of the binary pair, this world receives gentle balanced radiation, has a rich nitrogen-oxygen atmosphere, and rolling highland continents.", stats: { "Surface Temp": "11°C avg", "Atmosphere": "N₂/O₂/CO₂", "Water": "55% surface", "Gravity": "1.02g", "Day Length": "33 Earth hours" }, best: true, reasons: [{ label: "Temperature", val: 91, note: "Stable & temperate" }, { label: "Atmosphere", val: 94, note: "Breathable" }, { label: "Water", val: 87, note: "Seas + rivers" }, { label: "Gravity", val: 98, note: "Near-Earth" }, { label: "Radiation", val: 80, note: "Lagrange shielded" }] },
+      { id: "p3", name: "Wavecrest", type: "Super-Ocean • Mid-Orbit", desc: "Tidal forces from the twin stars churn endless megastorms across a global ocean. No landmasses.", stats: { "Surface Temp": "28°C avg", "Atmosphere": "Water vapour/N₂", "Water": "100% surface", "Gravity": "1.15g", "Day Length": "40 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 60, note: "Warm but wet" }, { label: "Atmosphere", val: 55, note: "Humid only" }, { label: "Water", val: 40, note: "Too much — no land" }, { label: "Gravity", val: 65, note: "Slightly heavy" }, { label: "Radiation", val: 60, note: "Moderate" }] },
+      { id: "p4", name: "Dustlance", type: "Desert • Far Orbit", desc: "A cold, dusty world far from both stars. Receives very little light. Underground geothermal vents keep the core warm.", stats: { "Surface Temp": "-80°C avg", "Atmosphere": "CO₂/N₂", "Water": "Underground geothermal", "Gravity": "0.85g", "Day Length": "72 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 18, note: "Too cold" }, { label: "Atmosphere", val: 22, note: "Not breathable" }, { label: "Water", val: 22, note: "Deep underground" }, { label: "Gravity", val: 82, note: "Manageable" }, { label: "Radiation", val: 70, note: "Low, far orbit" }] },
+      { id: "p5", name: "Helixar", type: "Rogue Rocky • Captured", desc: "A captured rogue planet with no original stellar orbit. Black skies, geothermal heat only. Strange mineral forests.", stats: { "Surface Temp": "-140°C avg", "Atmosphere": "Trace N₂", "Water": "None surface", "Gravity": "0.95g", "Day Length": "N/A — no star" }, best: false, reasons: [{ label: "Temperature", val: 10, note: "Freezing cold" }, { label: "Atmosphere", val: 8, note: "Almost none" }, { label: "Water", val: 5, note: "Deep rock only" }, { label: "Gravity", val: 88, note: "Good" }, { label: "Radiation", val: 80, note: "No star = low" }] }
+    ]
+  },
+  {
+    level: 5, systemName: "Aethon's Crown", starColor: 5,
+    mission: "A rare green-white star, ancient and stable. This is the final frontier. Find humanity's new permanent home.",
+    planets: [
+      { id: "p1", name: "Embervast", type: "Volcanic • Tidally Stressed", desc: "Tidally heated by two massive moons. Perpetual eruptions and lava rivers. Beautiful but lethal.", stats: { "Surface Temp": "340°C", "Atmosphere": "SO₂/CO₂", "Water": "Lava only", "Gravity": "1.3g", "Day Length": "18 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 4, note: "Molten surface" }, { label: "Atmosphere", val: 3, note: "Toxic gases" }, { label: "Water", val: 0, note: "None" }, { label: "Gravity", val: 55, note: "Too heavy" }, { label: "Radiation", val: 20, note: "High" }] },
+      { id: "p2", name: "Obrigan", type: "Rocky • Eccentric Orbit", desc: "Highly elliptical orbit causes extreme seasonal swings — scorching summers, glacial winters every 8 years.", stats: { "Surface Temp": "-80°C to 200°C (cycle)", "Atmosphere": "N₂/CO₂", "Water": "Periodic seas", "Gravity": "0.95g", "Day Length": "22 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 25, note: "Extreme cycles" }, { label: "Atmosphere", val: 35, note: "Partial only" }, { label: "Water", val: 30, note: "Seasonal" }, { label: "Gravity", val: 88, note: "Good" }, { label: "Radiation", val: 45, note: "Variable" }] },
+      { id: "p3", name: "Aetherholm", type: "Terrestrial • Prime Habitable", desc: "A golden world of vast forests, turquoise seas, and continent-spanning mountain ranges. Ancient and geologically stable. The perfect home.", stats: { "Surface Temp": "16°C avg", "Atmosphere": "N₂/O₂/Ar", "Water": "68% surface", "Gravity": "1.01g", "Day Length": "25 Earth hours" }, best: true, reasons: [{ label: "Temperature", val: 97, note: "Near-perfect" }, { label: "Atmosphere", val: 99, note: "Ideal mix" }, { label: "Water", val: 95, note: "Abundant" }, { label: "Gravity", val: 99, note: "Virtually identical" }, { label: "Radiation", val: 93, note: "Well shielded" }] },
+      { id: "p4", name: "Glassmere", type: "Crystal Desert • Mid", desc: "A silicon-rich world encrusted with crystalline formations that scatter starlight beautifully but dangerously. Razor-sharp at every turn.", stats: { "Surface Temp": "42°C avg", "Atmosphere": "Silicate dust/N₂", "Water": "Underground aquifers", "Gravity": "1.18g", "Day Length": "27 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 45, note: "Too warm" }, { label: "Atmosphere", val: 18, note: "Caustic dust" }, { label: "Water", val: 25, note: "Deep underground" }, { label: "Gravity", val: 60, note: "Heavy" }, { label: "Radiation", val: 52, note: "Crystal scatter" }] },
+      { id: "p5", name: "Nebulon", type: "Gas Dwarf • Outer", desc: "A small gas world with swirling pastel clouds. No solid surface. Enormous magnetic field though.", stats: { "Surface Temp": "-60°C cloud tops", "Atmosphere": "H₂/He/CH₄", "Water": "None accessible", "Gravity": "1.9g", "Day Length": "14 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 12, note: "Far too cold" }, { label: "Atmosphere", val: 5, note: "No oxygen" }, { label: "Water", val: 8, note: "Inaccessible" }, { label: "Gravity", val: 25, note: "Too strong" }, { label: "Radiation", val: 68, note: "Shielded by field" }] }
+    ]
+  }
+];
+
+function drawPlanetCanvas(c2d, artKey, sz) {
+  const r = sz; c2d.clearRect(0, 0, r * 2, r * 2);
+  const cx2 = r, cy2 = r;
+  if (artKey === 'terrestrial_green') {
+    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
+    g.addColorStop(0,'#6ec86e'); g.addColorStop(.5,'#2a7a3a'); g.addColorStop(1,'#1a4a28');
+    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(60,130,200,0.7)';
+    c2d.beginPath(); c2d.ellipse(cx2+r*.1, cy2+r*.1, r*.35, r*.2, 0.4, 0, Math.PI*2); c2d.fill();
+    c2d.beginPath(); c2d.ellipse(cx2-r*.2, cy2-r*.05, r*.22, r*.13, -.3, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(255,255,255,0.18)';
+    c2d.beginPath(); c2d.ellipse(cx2-r*.05, cy2-r*.3, r*.3, r*.08, -.2, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(0,0,0,0.22)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
+  } else if (artKey === 'terrestrial_desert') {
+    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
+    g.addColorStop(0,'#e8b86a'); g.addColorStop(.5,'#c48a3a'); g.addColorStop(1,'#7a4a1a');
+    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(180,120,60,0.5)';
+    for (let i = 0; i < 4; i++) { c2d.beginPath(); c2d.ellipse(cx2+(i-1.5)*r*.3, cy2+r*.1*(i%2-.5), r*.18, r*.08, i*.4, 0, Math.PI*2); c2d.fill(); }
+    c2d.fillStyle = 'rgba(255,240,200,0.15)';
+    c2d.beginPath(); c2d.ellipse(cx2, cy2-r*.35, r*.4, r*.1, 0, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(0,0,0,0.2)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
+  } else if (artKey === 'terrestrial_red') {
+    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
+    g.addColorStop(0,'#cc5533'); g.addColorStop(.5,'#992211'); g.addColorStop(1,'#551100');
+    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(220,100,30,0.5)';
+    c2d.beginPath(); c2d.ellipse(cx2, cy2+r*.15, r*.5, r*.15, 0, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(255,180,100,0.2)';
+    c2d.beginPath(); c2d.ellipse(cx2+r*.1, cy2-r*.2, r*.45, r*.12, -.2, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(0,0,0,0.22)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
+  } else if (artKey === 'terrestrial_cold') {
+    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
+    g.addColorStop(0,'#aaccee'); g.addColorStop(.5,'#4477aa'); g.addColorStop(1,'#223355');
+    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(220,240,255,0.7)';
+    c2d.beginPath(); c2d.ellipse(cx2, cy2-r*.55, r*.5, r*.2, 0, 0, Math.PI*2); c2d.fill();
+    c2d.beginPath(); c2d.ellipse(cx2, cy2+r*.55, r*.55, r*.2, 0, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(180,220,255,0.35)';
+    c2d.beginPath(); c2d.ellipse(cx2+r*.15, cy2, r*.25, r*.4, -.1, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(0,0,0,0.2)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
+  } else if (artKey === 'terrestrial_half') {
+    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
+    g.addColorStop(0,'#e8a84a'); g.addColorStop(.5,'#c06820'); g.addColorStop(1,'#6a2800');
+    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(180,220,255,0.85)';
+    c2d.beginPath(); c2d.arc(cx2, cy2, r, Math.PI*.5, Math.PI*1.5); c2d.closePath(); c2d.fill();
+    c2d.fillStyle = 'rgba(255,255,255,0.6)';
+    c2d.beginPath(); c2d.ellipse(cx2, cy2, r*.08, r, 0, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(0,0,0,0.22)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
+  } else if (artKey === 'ice') {
+    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
+    g.addColorStop(0,'#eef6ff'); g.addColorStop(.5,'#99ccee'); g.addColorStop(1,'#3366aa');
+    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
+    c2d.strokeStyle = 'rgba(255,255,255,0.4)'; c2d.lineWidth = .8;
+    for (let i = 0; i < 5; i++) { c2d.beginPath(); c2d.moveTo(cx2-r+i*r*.4, cy2-r+i*r*.3); c2d.lineTo(cx2+r*.2, cy2+r*.6-i*r*.2); c2d.stroke(); }
+    c2d.fillStyle = 'rgba(0,0,0,0.18)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
+  } else if (artKey === 'volcanic') {
+    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
+    g.addColorStop(0,'#aa3300'); g.addColorStop(.4,'#661100'); g.addColorStop(1,'#220500');
+    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(255,100,0,0.8)';
+    c2d.beginPath(); c2d.ellipse(cx2+r*.1, cy2+r*.2, r*.35, r*.1, -.2, 0, Math.PI*2); c2d.fill();
+    c2d.beginPath(); c2d.ellipse(cx2-r*.2, cy2-r*.05, r*.2, r*.06, .3, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(255,200,0,0.6)';
+    c2d.beginPath(); c2d.ellipse(cx2+r*.15, cy2+r*.15, r*.15, r*.04, -.1, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(80,20,0,0.6)';
+    c2d.beginPath(); c2d.ellipse(cx2-r*.1, cy2-r*.25, r*.25, r*.12, .2, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(0,0,0,0.25)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
+  } else if (artKey === 'gas_giant') {
+    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
+    g.addColorStop(0,'#ddaa88'); g.addColorStop(.5,'#aa6644'); g.addColorStop(1,'#552211');
+    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
+    const bands = [['rgba(180,120,80,0.5)',-.35],['rgba(220,170,120,0.4)',-.15],['rgba(160,90,50,0.5)',.1],['rgba(210,160,100,0.4)',.3]];
+    bands.forEach(([col,off]) => { c2d.fillStyle = col; c2d.beginPath(); c2d.ellipse(cx2, cy2+r*off, r, r*.08, 0, 0, Math.PI*2); c2d.fill(); });
+    c2d.strokeStyle = 'rgba(200,150,100,0.6)'; c2d.lineWidth = r*.3; c2d.beginPath();
+    c2d.ellipse(cx2, cy2, r*1.55, r*.2, 0, 0, Math.PI*2); c2d.stroke();
+    c2d.fillStyle = 'rgba(0,0,0,0.2)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
+  } else if (artKey === 'gas_yellow') {
+    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
+    g.addColorStop(0,'#eecc44'); g.addColorStop(.5,'#aaaa00'); g.addColorStop(1,'#445500');
+    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(180,180,0,0.4)';
+    c2d.beginPath(); c2d.ellipse(cx2, cy2+r*.2, r, r*.07, 0, 0, Math.PI*2); c2d.fill();
+    c2d.beginPath(); c2d.ellipse(cx2, cy2-r*.15, r, r*.06, 0, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(0,0,0,0.2)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
+  } else if (artKey === 'meteor') {
+    const g = c2d.createRadialGradient(cx2-r*.2, cy2-r*.2, r*.05, cx2, cy2, r);
+    g.addColorStop(0,'#888880'); g.addColorStop(.6,'#555550'); g.addColorStop(1,'#222220');
+    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r*.8, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(30,30,28,0.7)';
+    [[-.25,-.2,.18],[.2,.15,.12],[-.1,.25,.1],[.3,-.25,.08]].forEach(([ox,oy,cr]) => { c2d.beginPath(); c2d.arc(cx2+r*ox, cy2+r*oy, r*cr, 0, Math.PI*2); c2d.fill(); });
+    c2d.fillStyle = 'rgba(0,0,0,0.25)'; c2d.beginPath(); c2d.arc(cx2+r*.15, cy2+r*.15, r*.8, 0, Math.PI*2); c2d.fill();
+  } else {
+    const g = c2d.createRadialGradient(cx2-r*.2, cy2-r*.2, r*.05, cx2, cy2, r);
+    g.addColorStop(0,'#998877'); g.addColorStop(.6,'#665544'); g.addColorStop(1,'#332211');
+    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r*.75, 0, Math.PI*2); c2d.fill();
+    c2d.fillStyle = 'rgba(20,18,15,0.6)';
+    [[-.2,-.1,.14],[.15,.2,.1]].forEach(([ox,oy,cr]) => { c2d.beginPath(); c2d.arc(cx2+r*ox, cy2+r*oy, r*cr, 0, Math.PI*2); c2d.fill(); });
+    c2d.fillStyle = 'rgba(0,0,0,0.22)'; c2d.beginPath(); c2d.arc(cx2+r*.15, cy2+r*.15, r*.75, 0, Math.PI*2); c2d.fill();
+  }
+}
+
+const LEVEL_PLANET_ART = [
+  [ {artKey:'volcanic',sz:20}, {artKey:'terrestrial_green',sz:26}, {artKey:'terrestrial_desert',sz:22}, {artKey:'gas_giant',sz:32}, {artKey:'ice',sz:22} ],
+  [ {artKey:'volcanic',sz:22}, {artKey:'terrestrial_green',sz:26}, {artKey:'terrestrial_cold',sz:22}, {artKey:'terrestrial_half',sz:20}, {artKey:'gas_yellow',sz:30} ],
+  [ {artKey:'meteor',sz:16}, {artKey:'terrestrial_green',sz:24}, {artKey:'terrestrial_desert',sz:20}, {artKey:'gas_yellow',sz:28}, {artKey:'ice',sz:20} ],
+  [ {artKey:'terrestrial_red',sz:22}, {artKey:'terrestrial_green',sz:26}, {artKey:'terrestrial_cold',sz:22}, {artKey:'terrestrial_desert',sz:20}, {artKey:'meteor',sz:16} ],
+  [ {artKey:'volcanic',sz:22}, {artKey:'terrestrial_red',sz:20}, {artKey:'terrestrial_green',sz:28}, {artKey:'terrestrial_desert',sz:20}, {artKey:'gas_yellow',sz:28} ],
+];
+
+let currentLevel = 0, isZoomedOut = false, selectedPlanetIdx = null, levelSolved = false, levelScores = [], gameComplete = false;
+
+const viewport = document.getElementById('viewport');
+const sun = document.getElementById('sun');
+const planetEls = [document.getElementById('p1'), document.getElementById('p2'), document.getElementById('p3'), document.getElementById('p4'), document.getElementById('p5')];
+const planetWraps = [document.getElementById('pw1'), document.getElementById('pw2'), document.getElementById('pw3'), document.getElementById('pw4'), document.getElementById('pw5')];
+const planetPanel = document.getElementById('planetPanel');
+const planetPanelTitle = document.getElementById('planetPanelTitle');
+const planetPanelMeta = document.getElementById('planetPanelMeta');
+const planetPanelDesc = document.getElementById('planetPanelDesc');
+const planetPanelStats = document.getElementById('planetPanelStats');
+const planetPanelClose = document.getElementById('planetPanelClose');
+const btnChoose = document.getElementById('btnChoose');
+const choiceResult = document.getElementById('choiceResult');
+const fadeOverlay = document.getElementById('fadeOverlay');
+const systemSplash = document.getElementById('systemSplash');
+const splashName = document.getElementById('splashName');
+const splashLevel = document.getElementById('splashLevel');
+const levelHud = document.getElementById('levelHud');
+const hudLabel = document.getElementById('hudLabel');
+const hudDots = document.getElementById('hudDots');
+const completionScreen = document.getElementById('completionScreen');
+const completionMedals = document.getElementById('completionMedals');
+const btnRestart = document.getElementById('btnRestart');
+const orbitSvg = document.getElementById('orbitSvg');
+const orbitRings = [1,2,3,4,5].map(i => document.getElementById('orbitRing' + i));
+
+// ── Orbit config: radius in px (max size) and period in ms ──
+// These are the ACTUAL radii the planet centres travel.
+// Match the SVG circle r values exactly.
+// Starting angles distributed so planets are visually separated at t=0.
+// Because orbits have very different radii (130–440px) and different speeds/directions,
+// nearby angles at different radii can still be spatially far apart.
+// We spread them by ~72° but also stagger by quadrant to avoid any clustering.
+const ORBIT_CONFIG = [
+  { maxR: 130, period: 14000, dir:  1, angle: Math.PI * 1.5  },  // top
+  { maxR: 210, period: 22000, dir: -1, angle: Math.PI * 0.3  },  // upper-right
+  { maxR: 295, period: 32000, dir:  1, angle: Math.PI * 1.1  },  // lower-left
+  { maxR: 385, period: 44000, dir: -1, angle: Math.PI * 1.8  },  // lower-right
+  { maxR: 440, period: 58000, dir:  1, angle: Math.PI * 0.7  },  // upper-left
+];
+
+// Current angle for each orbit (updated by rAF loop)
+const orbitAngles = ORBIT_CONFIG.map(c => c.angle);
+
+// Compute the pixel radius for this orbit based on current system size.
+// The system element is min(98vmin, 900px) square, centred at 50%/50%.
+// Our maxR values assume the 900px max. Scale linearly with actual size.
+function getOrbitR(i) {
+  const systemSize = Math.min(window.innerWidth, window.innerHeight) * 0.98;
+  const scale = Math.min(systemSize, 900) / 900;
+  return ORBIT_CONFIG[i].maxR * scale;
+}
+
+// Update SVG ring radii and planet positions each frame
+let rafId = null;
+let lastTime = null;
+
+function orbitTick(ts) {
+  if (lastTime === null) lastTime = ts;
+  const dt = ts - lastTime;
+  lastTime = ts;
+
+  // Get system centre in system-el coordinates (system el is positioned at centre of system-wrap)
+  const systemEl = document.getElementById('systemEl');
+  const systemRect = systemEl.getBoundingClientRect();
+  // Centre of system in system-el local coords
+  const cx = systemRect.width / 2;
+  const cy = systemRect.height / 2;
+
+  ORBIT_CONFIG.forEach((cfg, i) => {
+    // Advance angle
+    orbitAngles[i] += (2 * Math.PI / cfg.period) * dt * cfg.dir;
+
+    const r = getOrbitR(i);
+
+    // Update SVG ring radius
+    orbitRings[i].setAttribute('r', r.toFixed(1));
+
+    // Position planet wrap at (cx + r*cos, cy + r*sin) in system-el coords
+    const px = cx + r * Math.cos(orbitAngles[i]);
+    const py = cy + r * Math.sin(orbitAngles[i]);
+    planetWraps[i].style.left = px + 'px';
+    planetWraps[i].style.top = py + 'px';
+  });
+
+  rafId = requestAnimationFrame(orbitTick);
+}
+
+function startOrbitLoop() {
+  if (rafId) cancelAnimationFrame(rafId);
+  lastTime = null;
+  rafId = requestAnimationFrame(orbitTick);
+}
+
+function init() { buildHudDots(); loadLevel(0, true); startOrbitLoop(); }
+
+function buildHudDots() {
+  hudDots.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const d = document.createElement('div'); d.className = 'hud-dot'; d.id = `hudDot${i}`; hudDots.appendChild(d);
+  }
+}
+
+function updateHud() {
+  hudLabel.textContent = `Level ${currentLevel + 1} of 5`;
+  for (let i = 0; i < 5; i++) {
+    const d = document.getElementById(`hudDot${i}`);
+    d.classList.remove('done', 'active');
+    if (i < currentLevel) d.classList.add('done');
+    else if (i === currentLevel) d.classList.add('active');
+  }
+}
+
+function loadLevel(idx, immediate = false) {
+  currentLevel = idx; isZoomedOut = false; selectedPlanetIdx = null; levelSolved = false;
+  const lv = LEVELS[idx];
+  sun.dataset.level = lv.starColor;
+  sun.className = 'sun';
+  sun.setAttribute('aria-label', `Star of ${lv.systemName} — click to explore planets`);
+
+  const arts = LEVEL_PLANET_ART[idx];
+  planetEls.forEach((el, i) => {
+    const { artKey, sz } = arts[i];
+    const diameter = sz * 2;
+    el.innerHTML = '';
+    el.style.background = 'none';
+    el.style.width = diameter + 'px';
+    el.style.height = diameter + 'px';
+    el.classList.remove('planet--selected');
+    const canvas = document.createElement('canvas');
+    canvas.width = diameter; canvas.height = diameter;
+    canvas.style.width = diameter + 'px'; canvas.style.height = diameter + 'px';
+    canvas.style.borderRadius = '50%'; canvas.style.display = 'block';
+    el.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    if (ctx) drawPlanetCanvas(ctx, artKey, sz);
+
+    // Accessibility on the wrap
+    planetWraps[i].setAttribute('aria-label', lv.planets[i].name);
+    planetWraps[i].setAttribute('role', 'button');
+    planetWraps[i].setAttribute('tabindex', '0');
+  });
+
+  closePlanetPanel();
+  choiceResult.innerHTML = '';
+  btnChoose.disabled = false;
+  btnChoose.style.display = '';
+  viewport.classList.remove('is-zoomed-out');
+  updateHud();
+  if (!immediate) levelHud.classList.add('visible');
+  else setTimeout(() => levelHud.classList.add('visible'), 400);
+
+  const subtitleEl = document.getElementById('landingSubtitle');
+  if (idx > 0) subtitleEl.textContent = lv.mission;
+  else subtitleEl.textContent = "Find the perfect alien home — click the star to pull back and see the whole system.";
+}
+
+sun.addEventListener('click', () => {
+  if (isZoomedOut) { viewport.classList.remove('is-zoomed-out'); isZoomedOut = false; closePlanetPanel(); }
+  else { viewport.classList.add('is-zoomed-out'); isZoomedOut = true; }
+});
+
+planetWraps.forEach((wrap, i) => {
+  wrap.addEventListener('click', () => { if (!isZoomedOut) return; selectPlanet(i); });
+  wrap.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && isZoomedOut) selectPlanet(i); });
+});
+
+function selectPlanet(i) {
+  selectedPlanetIdx = i;
+  planetEls.forEach((el, j) => el.classList.toggle('planet--selected', j === i));
+  openPlanetPanel(LEVELS[currentLevel].planets[i]);
+}
+
+function openPlanetPanel(planet) {
+  planetPanelTitle.textContent = planet.name;
+  planetPanelMeta.textContent = planet.type;
+  planetPanelDesc.textContent = planet.desc;
+  planetPanelStats.innerHTML = '';
+  Object.entries(planet.stats).forEach(([k, v]) => {
+    const row = document.createElement('div'); row.className = 'planet-panel__stat';
+    row.innerHTML = `<span class="planet-panel__label">${k}</span><span class="planet-panel__value">${v}</span>`;
+    planetPanelStats.appendChild(row);
+  });
+  choiceResult.innerHTML = '';
+  btnChoose.style.display = '';
+  btnChoose.disabled = levelSolved;
+  planetPanel.classList.add('planet-panel--open');
+  planetPanel.setAttribute('aria-hidden', 'false');
+}
+
+function closePlanetPanel() {
+  planetPanel.classList.remove('planet-panel--open');
+  planetPanel.setAttribute('aria-hidden', 'true');
+  planetEls.forEach(el => el.classList.remove('planet--selected'));
+  selectedPlanetIdx = null;
+}
+
+planetPanelClose.addEventListener('click', closePlanetPanel);
+
+btnChoose.addEventListener('click', () => {
+  if (selectedPlanetIdx === null || levelSolved) return;
+  const planet = LEVELS[currentLevel].planets[selectedPlanetIdx];
+  if (planet.best) {
+    levelSolved = true; btnChoose.style.display = 'none';
+    const total = Math.round(planet.reasons.reduce((s, r) => s + r.val, 0) / planet.reasons.length);
+    levelScores.push({ name: planet.name, score: total, level: currentLevel + 1 });
+    showHabitabilityResult(planet, total);
+  } else {
+    choiceResult.innerHTML = `<div class="result-wrong"><strong>Not quite right.</strong><br>${planet.name} has significant habitability problems — keep exploring the other planets in this system.</div>`;
+  }
+});
+
+function showHabitabilityResult(planet, total) {
+  let reasonsHTML = planet.reasons.map(r => {
+    const cls = r.val >= 75 ? 'great' : r.val >= 40 ? 'ok' : 'bad';
+    return `<div class="score-row"><span class="score-row-label">${r.label}</span><div class="score-bar-wrap"><div class="score-bar ${cls}" style="width:${r.val}%"></div></div><span class="score-val ${cls}">${r.val}%</span></div>`;
+  }).join('');
+  const isLast = currentLevel === 4;
+  choiceResult.innerHTML = `
+    <div class="result-right">
+      <div class="score-title">✓ Habitable World Found</div>
+      <div class="score-big">${total}%</div>
+      <div class="score-sub">Habitability Score for ${planet.name}</div>
+      <div class="score-reasons">${reasonsHTML}</div>
+    </div>
+    <button class="btn-next" id="btnNext">${isLast ? '🏆 Complete Mission' : 'Continue to Next System →'}</button>
+  `;
+  setTimeout(() => {
+    document.querySelectorAll('.score-bar').forEach((b, i) => { b.style.width = planet.reasons[i].val + '%'; });
+  }, 50);
+  document.getElementById('btnNext').addEventListener('click', () => {
+    if (isLast) triggerCompletion(); else transitionToNextLevel();
+  });
+}
+
+function transitionToNextLevel() {
+  const next = currentLevel + 1;
+  const nextLv = LEVELS[next];
+  fadeOverlay.classList.add('fade-in');
+  setTimeout(() => {
+    loadLevel(next);
+    splashName.textContent = nextLv.systemName;
+    splashLevel.textContent = `Level ${next + 1} of 5`;
+    systemSplash.classList.add('visible');
+    setTimeout(() => { fadeOverlay.classList.remove('fade-in'); }, 800);
+    sun.addEventListener('click', dismissSplashOnce, { once: true });
+  }, 900);
+}
+
+function dismissSplashOnce() { systemSplash.classList.remove('visible'); }
+
+function triggerCompletion() {
+  for (let i = 0; i < 5; i++) {
+    document.getElementById(`hudDot${i}`).classList.add('done');
+    document.getElementById(`hudDot${i}`).classList.remove('active');
+  }
+  fadeOverlay.classList.add('fade-in');
+  setTimeout(() => { buildCompletionScreen(); completionScreen.classList.add('visible'); fadeOverlay.classList.remove('fade-in'); }, 900);
+}
+
+function buildCompletionScreen() {
+  const starsEl = document.getElementById('completionStars');
+  starsEl.innerHTML = '';
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div'); s.className = 'c-star';
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*2}s;`;
+    starsEl.appendChild(s);
+  }
+  const emojis = ['🌿','🌊','🔴','💠','🌟'];
+  completionMedals.innerHTML = levelScores.map((s, i) => `
+    <div class="c-medal"><div class="m-planet">${emojis[i]}</div><div class="m-name">${s.name}</div><div class="m-score">${s.score}%</div></div>
+  `).join('');
+}
+
+btnRestart.addEventListener('click', () => {
+  completionScreen.classList.remove('visible');
+  levelScores = []; gameComplete = false;
+  systemSplash.classList.remove('visible');
+  fadeOverlay.classList.add('fade-in');
+  setTimeout(() => { loadLevel(0, true); fadeOverlay.classList.remove('fade-in'); }, 600);
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  splashName.textContent = LEVELS[0].systemName;
+  splashLevel.textContent = 'Level 1 of 5';
+  systemSplash.classList.add('visible');
+  fadeOverlay.style.opacity = '1';
+  fadeOverlay.style.transition = 'none';
+  setTimeout(() => {
+    fadeOverlay.style.transition = 'opacity 0.9s ease';
+    fadeOverlay.classList.remove('fade-in');
+    fadeOverlay.style.opacity = '';
+  }, 100);
+  sun.addEventListener('click', dismissSplashOnce, { once: true });
+});
+
+init();
+</script>
 </body>
 </html>
