@@ -99,7 +99,10 @@
       border: 1.5px solid rgba(148,163,184,0.4);
       background: transparent;
       transition: all 0.4s ease;
+      cursor: default;
     }
+    .hud-dot.clickable { cursor: pointer; }
+    .hud-dot.locked { opacity: 0.45; }
     .hud-dot.done { background: var(--accent3); border-color: var(--accent3); box-shadow: 0 0 8px rgba(34,197,94,0.6); }
     .hud-dot.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 8px rgba(56,189,248,0.6); }
 
@@ -280,8 +283,14 @@
       transform: translate(-50%, -50%);
       pointer-events: none;
       z-index: 2;
+      opacity: 0;
+      transition: opacity calc(var(--zoom-duration) * .45) var(--zoom-ease);
     }
-    .viewport.is-zoomed-out .planet-wrap { pointer-events: auto; cursor: pointer; }
+    .viewport.is-zoomed-out .planet-wrap {
+      opacity: 1;
+      pointer-events: auto;
+      cursor: pointer;
+    }
 
     .planet {
       border-radius: 50%;
@@ -484,7 +493,7 @@
   <!-- Info below star -->
   <div class="landing-bottom" id="landingBottom">
     <div class="landing-card">
-      <p class="subtitle" id="landingSubtitle">Find the perfect alien home — click the star to pull back and see the whole system.</p>
+      <p class="subtitle" id="landingSubtitle">G-type star -> G‑type stars have surface temperatures of 4,927°C to 5,727°C, with sizes close to the Sun at about 0.9–1.1 solar masses, and luminosities ranging from 0.6 to 1.5 times that of the Sun.</p>
       <p class="tap-hint"><strong>Tip:</strong> Click the star again to return to this view.</p>
     </div>
   </div>
@@ -512,7 +521,7 @@
     </div>
   </div>
 
-  <p class="zoom-hint" id="zoomHint">Solar system view — click the star to zoom back in</p>
+  <p class="zoom-hint" id="zoomHint">Solar system view —> click the star to zoom back in</p>
 </div>
 
 <div id="completionScreen">
@@ -521,7 +530,7 @@
     <div class="completion-badge">🌍</div>
     <div class="completion-eyebrow">Mission Accomplished</div>
     <div class="completion-title">New Homes Found</div>
-    <p class="completion-sub">You've successfully guided humanity across 5 star systems and found habitable planets for each colony. The species lives on.</p>
+    <p class="completion-sub">You've successfully aided multiple species across 5 star systems and found habitable planets for each civilisation. Life continues.</p>
     <div class="completion-medals" id="completionMedals"></div>
     <button class="btn-restart" id="btnRestart">Play Again</button>
   </div>
@@ -531,7 +540,7 @@
 const LEVELS = [
   {
     level: 1, systemName: "Sol Secundus", starColor: 1,
-    mission: "A yellow dwarf star system. Find a world that can support liquid water and breathable air.",
+    mission: "A yellow dwarf star system. Star profile: surface temperature ~5,500°C, lifespan ~10 billion years, and solar mass ~1.0 Msun. Find a world that can support liquid water and breathable air.",
     planets: [
       { id: "p1", name: "Cinder", type: "Rocky • Inner", desc: "A scorched rock far too close to the star. Temperatures routinely exceed 450°C. No atmosphere to speak of.", stats: { "Surface Temp": "450°C", "Atmosphere": "None", "Water": "None", "Gravity": "0.38g", "Day Length": "58 Earth days" }, best: false, reasons: [{ label: "Temperature", val: 5, note: "Far too hot" }, { label: "Atmosphere", val: 0, note: "None detected" }, { label: "Water", val: 0, note: "Vaporised" }, { label: "Gravity", val: 40, note: "Too low" }, { label: "Radiation", val: 10, note: "Extreme" }] },
       { id: "p2", name: "Verdana", type: "Terrestrial • Habitable Zone", desc: "A lush blue-green world sitting comfortably in the habitable zone. Dense oxygen-nitrogen atmosphere, liquid oceans, and stable seasons.", stats: { "Surface Temp": "14°C avg", "Atmosphere": "N₂/O₂ mix", "Water": "71% surface", "Gravity": "1.05g", "Day Length": "26 Earth hours" }, best: true, reasons: [{ label: "Temperature", val: 95, note: "Near-ideal" }, { label: "Atmosphere", val: 98, note: "Breathable" }, { label: "Water", val: 92, note: "Abundant liquid" }, { label: "Gravity", val: 96, note: "Comfortable" }, { label: "Radiation", val: 88, note: "Protected" }] },
@@ -542,7 +551,7 @@ const LEVELS = [
   },
   {
     level: 2, systemName: "Pyraxis Drift", starColor: 2,
-    mission: "An orange K-type star. Find a stable, warm world — the star is dimmer so the habitable zone is closer in.",
+    mission: "K-class stars: A K-class star has a surface temperature of about 3,700–5,200 °C, a mass around 0.5–0.8 times the Sun, a luminosity of roughly 0.08–0.6 times solar, and a lifespan of about 15–30 billion years.",
     planets: [
       { id: "p1", name: "Scoria", type: "Volcanic • Inner", desc: "Relentless volcanic activity resurfaces this world every century. Sulfuric acid rain. No stable land.", stats: { "Surface Temp": "380°C", "Atmosphere": "SO₂/CO₂", "Water": "None", "Gravity": "0.92g", "Day Length": "243 Earth days" }, best: false, reasons: [{ label: "Temperature", val: 5, note: "Volcanic hellscape" }, { label: "Atmosphere", val: 2, note: "Toxic acid clouds" }, { label: "Water", val: 0, note: "Evaporated" }, { label: "Gravity", val: 82, note: "Near Earth" }, { label: "Radiation", val: 12, note: "High" }] },
       { id: "p2", name: "Havenport", type: "Terrestrial • Habitable Zone", desc: "Warm coastal plains, a thick protective magnetosphere, and vast shallow seas make this world a near-perfect refuge.", stats: { "Surface Temp": "22°C avg", "Atmosphere": "N₂/O₂/Ar", "Water": "62% surface", "Gravity": "0.98g", "Day Length": "29 Earth hours" }, best: true, reasons: [{ label: "Temperature", val: 92, note: "Warm, stable" }, { label: "Atmosphere", val: 96, note: "Fully breathable" }, { label: "Water", val: 88, note: "Shallow seas" }, { label: "Gravity", val: 97, note: "Nearly identical" }, { label: "Radiation", val: 91, note: "Strong magnetosphere" }] },
@@ -553,7 +562,7 @@ const LEVELS = [
   },
   {
     level: 3, systemName: "Rubicant's Eye", starColor: 3,
-    mission: "A red dwarf star. These stars are common but flare frequently. Seek a world with strong shielding.",
+    mission: "M-class stars: An M-class star has a surface temperature of about 2,200–3,700 °C, a mass around 0.08–0.5 times the Sun, a luminosity of roughly 0.0001–0.08 times solar, and a lifespan ranging from 50 billion to over a trillion years.",
     planets: [
       { id: "p1", name: "Ashveil", type: "Rocky • Flare-Blasted", desc: "Stripped of its atmosphere by repeated stellar flares. Bare rock under constant X-ray bombardment.", stats: { "Surface Temp": "120°C day / -180°C night", "Atmosphere": "None", "Water": "None", "Gravity": "0.61g", "Day Length": "Tidally locked" }, best: false, reasons: [{ label: "Temperature", val: 8, note: "Extreme swing" }, { label: "Atmosphere", val: 0, note: "Stripped away" }, { label: "Water", val: 0, note: "None" }, { label: "Gravity", val: 55, note: "Low" }, { label: "Radiation", val: 1, note: "Lethal flares" }] },
       { id: "p2", name: "Miravel", type: "Terrestrial • Deep Magnetosphere", desc: "A compact world with an unusually powerful magnetic field shielding it from flares. Deep red-lit forests, breathable air, and warm springs.", stats: { "Surface Temp": "18°C avg", "Atmosphere": "N₂/O₂", "Water": "48% surface", "Gravity": "0.9g", "Day Length": "62 Earth hours" }, best: true, reasons: [{ label: "Temperature", val: 88, note: "Warm and stable" }, { label: "Atmosphere", val: 90, note: "Breathable" }, { label: "Water", val: 82, note: "Good coverage" }, { label: "Gravity", val: 88, note: "Comfortable" }, { label: "Radiation", val: 85, note: "Strong mag. shield" }] },
@@ -563,8 +572,8 @@ const LEVELS = [
     ]
   },
   {
-    level: 4, systemName: "Veilwatch Binary", starColor: 4,
-    mission: "A binary system with two stars — one blue-white, one dimmer companion. Orbits are chaotic. Find stability.",
+    level: 4, systemName: "Veilwatch", starColor: 4,
+    mission: "B-class stars: A B-class star has a surface temperature of about 10,000–30,000 °C, a mass around 2–16 times the Sun, a luminosity of roughly 25–30,000 times solar, and a lifespan of about 10–100 million years.",
     planets: [
       { id: "p1", name: "Solarfract", type: "Chaotic • Inner Crossing", desc: "Its orbit crosses both stars, creating seasons of searing heat followed by deep freeze.", stats: { "Surface Temp": "-120°C to 600°C", "Atmosphere": "Ionised plasma", "Water": "None", "Gravity": "1.1g", "Day Length": "Variable" }, best: false, reasons: [{ label: "Temperature", val: 2, note: "Wildly unstable" }, { label: "Atmosphere", val: 0, note: "Ionised, lethal" }, { label: "Water", val: 0, note: "None" }, { label: "Gravity", val: 75, note: "Fine" }, { label: "Radiation", val: 0, note: "Extreme dual-star" }] },
       { id: "p2", name: "Calixara", type: "Terrestrial • Stable Lagrange", desc: "Nestled at the stable Lagrange point of the binary pair, this world receives gentle balanced radiation, has a rich nitrogen-oxygen atmosphere, and rolling highland continents.", stats: { "Surface Temp": "11°C avg", "Atmosphere": "N₂/O₂/CO₂", "Water": "55% surface", "Gravity": "1.02g", "Day Length": "33 Earth hours" }, best: true, reasons: [{ label: "Temperature", val: 91, note: "Stable & temperate" }, { label: "Atmosphere", val: 94, note: "Breathable" }, { label: "Water", val: 87, note: "Seas + rivers" }, { label: "Gravity", val: 98, note: "Near-Earth" }, { label: "Radiation", val: 80, note: "Lagrange shielded" }] },
@@ -575,7 +584,7 @@ const LEVELS = [
   },
   {
     level: 5, systemName: "Aethon's Crown", starColor: 5,
-    mission: "A rare green-white star, ancient and stable. This is the final frontier. Find humanity's new permanent home.",
+    mission: "An extremely rare green-white star, ancient and stable. This is the final frontier. Find humanity's new permanent home.",
     planets: [
       { id: "p1", name: "Embervast", type: "Volcanic • Tidally Stressed", desc: "Tidally heated by two massive moons. Perpetual eruptions and lava rivers. Beautiful but lethal.", stats: { "Surface Temp": "340°C", "Atmosphere": "SO₂/CO₂", "Water": "Lava only", "Gravity": "1.3g", "Day Length": "18 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 4, note: "Molten surface" }, { label: "Atmosphere", val: 3, note: "Toxic gases" }, { label: "Water", val: 0, note: "None" }, { label: "Gravity", val: 55, note: "Too heavy" }, { label: "Radiation", val: 20, note: "High" }] },
       { id: "p2", name: "Obrigan", type: "Rocky • Eccentric Orbit", desc: "Highly elliptical orbit causes extreme seasonal swings — scorching summers, glacial winters every 8 years.", stats: { "Surface Temp": "-80°C to 200°C (cycle)", "Atmosphere": "N₂/CO₂", "Water": "Periodic seas", "Gravity": "0.95g", "Day Length": "22 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 25, note: "Extreme cycles" }, { label: "Atmosphere", val: 35, note: "Partial only" }, { label: "Water", val: 30, note: "Seasonal" }, { label: "Gravity", val: 88, note: "Good" }, { label: "Radiation", val: 45, note: "Variable" }] },
@@ -698,6 +707,7 @@ const LEVEL_PLANET_ART = [
 ];
 
 let currentLevel = 0, isZoomedOut = false, selectedPlanetIdx = null, levelSolved = false, levelScores = [], gameComplete = false;
+const completedLevels = new Set();
 
 const viewport = document.getElementById('viewport');
 const sun = document.getElementById('sun');
@@ -742,7 +752,8 @@ const orbitAngles = ORBIT_CONFIG.map(c => c.angle);
 // The system element is min(98vmin, 900px) square, centred at 50%/50%.
 // Our maxR values assume the 900px max. Scale linearly with actual size.
 function getOrbitR(i) {
-  const systemSize = Math.min(window.innerWidth, window.innerHeight) * 0.98;
+  const systemEl = document.getElementById('systemEl');
+  const systemSize = Math.min(systemEl.clientWidth, systemEl.clientHeight);
   const scale = Math.min(systemSize, 900) / 900;
   return ORBIT_CONFIG[i].maxR * scale;
 }
@@ -756,12 +767,12 @@ function orbitTick(ts) {
   const dt = ts - lastTime;
   lastTime = ts;
 
-  // Get system centre in system-el coordinates (system el is positioned at centre of system-wrap)
+  // Get centre in local (unscaled) system coordinates.
+  // Using getBoundingClientRect() here includes CSS zoom scale and causes
+  // diagonal drift during the zoom transition.
   const systemEl = document.getElementById('systemEl');
-  const systemRect = systemEl.getBoundingClientRect();
-  // Centre of system in system-el local coords
-  const cx = systemRect.width / 2;
-  const cy = systemRect.height / 2;
+  const cx = systemEl.clientWidth / 2;
+  const cy = systemEl.clientHeight / 2;
 
   ORBIT_CONFIG.forEach((cfg, i) => {
     // Advance angle
@@ -793,17 +804,45 @@ function init() { buildHudDots(); loadLevel(0, true); startOrbitLoop(); }
 function buildHudDots() {
   hudDots.innerHTML = '';
   for (let i = 0; i < 5; i++) {
-    const d = document.createElement('div'); d.className = 'hud-dot'; d.id = `hudDot${i}`; hudDots.appendChild(d);
+    const d = document.createElement('div');
+    d.className = 'hud-dot locked';
+    d.id = `hudDot${i}`;
+    d.setAttribute('role', 'button');
+    d.setAttribute('aria-label', `Go to level ${i + 1}`);
+    d.tabIndex = 0;
+    d.addEventListener('click', () => trySelectLevel(i));
+    d.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        trySelectLevel(i);
+      }
+    });
+    hudDots.appendChild(d);
   }
+}
+
+function trySelectLevel(levelIdx) {
+  const highestCompleted = completedLevels.size ? Math.max(...completedLevels) : -1;
+  const highestAllowed = Math.min(4, highestCompleted + 1);
+  if (levelIdx > highestAllowed) return;
+  if (levelIdx === currentLevel) return;
+  loadLevel(levelIdx);
 }
 
 function updateHud() {
   hudLabel.textContent = `Level ${currentLevel + 1} of 5`;
+  const highestCompleted = completedLevels.size ? Math.max(...completedLevels) : -1;
+  const highestAllowed = Math.min(4, highestCompleted + 1);
   for (let i = 0; i < 5; i++) {
     const d = document.getElementById(`hudDot${i}`);
-    d.classList.remove('done', 'active');
-    if (i < currentLevel) d.classList.add('done');
-    else if (i === currentLevel) d.classList.add('active');
+    d.classList.remove('done', 'active', 'clickable', 'locked');
+    const done = completedLevels.has(i);
+    const selectable = i <= highestAllowed;
+    if (done) d.classList.add('done');
+    if (selectable) d.classList.add('clickable');
+    else d.classList.add('locked');
+    if (i === currentLevel) d.classList.add('active');
+    d.setAttribute('aria-disabled', selectable ? 'false' : 'true');
   }
 }
 
@@ -848,7 +887,7 @@ function loadLevel(idx, immediate = false) {
 
   const subtitleEl = document.getElementById('landingSubtitle');
   if (idx > 0) subtitleEl.textContent = lv.mission;
-  else subtitleEl.textContent = "Find the perfect alien home — click the star to pull back and see the whole system.";
+  else subtitleEl.textContent = "G-class stars: A G-class star has a surface temperature of about 5,300–6,000 °C, a mass around 0.8–1.1 times the Sun, a luminosity of roughly 0.6–1.5 times solar, and a lifespan of about 8–12 billion years.";
 }
 
 sun.addEventListener('click', () => {
@@ -898,6 +937,8 @@ btnChoose.addEventListener('click', () => {
   const planet = LEVELS[currentLevel].planets[selectedPlanetIdx];
   if (planet.best) {
     levelSolved = true; btnChoose.style.display = 'none';
+    completedLevels.add(currentLevel);
+    updateHud();
     const total = Math.round(planet.reasons.reduce((s, r) => s + r.val, 0) / planet.reasons.length);
     levelScores.push({ name: planet.name, score: total, level: currentLevel + 1 });
     showHabitabilityResult(planet, total);
@@ -946,6 +987,8 @@ function transitionToNextLevel() {
 function dismissSplashOnce() { systemSplash.classList.remove('visible'); }
 
 function triggerCompletion() {
+  for (let i = 0; i < 5; i++) completedLevels.add(i);
+  updateHud();
   for (let i = 0; i < 5; i++) {
     document.getElementById(`hudDot${i}`).classList.add('done');
     document.getElementById(`hudDot${i}`).classList.remove('active');
@@ -972,6 +1015,7 @@ function buildCompletionScreen() {
 btnRestart.addEventListener('click', () => {
   completionScreen.classList.remove('visible');
   levelScores = []; gameComplete = false;
+  completedLevels.clear();
   systemSplash.classList.remove('visible');
   fadeOverlay.classList.add('fade-in');
   setTimeout(() => { loadLevel(0, true); fadeOverlay.classList.remove('fade-in'); }, 600);
