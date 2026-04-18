@@ -727,16 +727,12 @@ const orbitRings = [1,2,3,4,5].map(i => document.getElementById('orbitRing' + i)
 // ── Orbit config: radius in px (max size) and period in ms ──
 // These are the ACTUAL radii the planet centres travel.
 // Match the SVG circle r values exactly.
-// Starting angles distributed so planets are visually separated at t=0.
-// Because orbits have very different radii (130–440px) and different speeds/directions,
-// nearby angles at different radii can still be spatially far apart.
-// We spread them by ~72° but also stagger by quadrant to avoid any clustering.
 const ORBIT_CONFIG = [
-  { maxR: 130, period: 14000, dir:  1, angle: Math.PI * 1.5  },  // top
-  { maxR: 210, period: 22000, dir: -1, angle: Math.PI * 0.3  },  // upper-right
-  { maxR: 295, period: 32000, dir:  1, angle: Math.PI * 1.1  },  // lower-left
-  { maxR: 385, period: 44000, dir: -1, angle: Math.PI * 1.8  },  // lower-right
-  { maxR: 440, period: 58000, dir:  1, angle: Math.PI * 0.7  },  // upper-left
+  { maxR: 130, minR: 14.45, period: 14000, dir:  1, angle: Math.PI * 0.1 },
+  { maxR: 210, minR: 23.35, period: 22000, dir: -1, angle: Math.PI * 0.6 },
+  { maxR: 295, minR: 32.80, period: 32000, dir:  1, angle: Math.PI * 1.2 },
+  { maxR: 385, minR: 42.80, period: 44000, dir: -1, angle: Math.PI * 1.8 },
+  { maxR: 440, minR: 48.90, period: 58000, dir:  1, angle: Math.PI * 0.9 },
 ];
 
 // Current angle for each orbit (updated by rAF loop)
@@ -994,7 +990,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }, 100);
   sun.addEventListener('click', dismissSplashOnce, { once: true });
 });
-
+//test
 init();
 </script>
 </body>
