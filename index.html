@@ -441,6 +441,33 @@
     }
     .btn-restart:hover { box-shadow: 0 0 30px rgba(56,189,248,.3); transform: translateY(-2px); }
 
+    /* ── Embedded Space Invaders ── */
+    #spaceInvadersScreen {
+      position: fixed; inset: 0; z-index: 450;
+      display: none; background: #000; color: #fff;
+    }
+    #spaceInvadersScreen.active { display: block; }
+    #siStarfield {
+      position: absolute; inset: 0; z-index: 0;
+    }
+    #siGameContainer {
+      position: relative; z-index: 2;
+      width: 800px; max-width: 100%;
+      margin: 3rem auto 0;
+      display: flex; justify-content: center;
+    }
+    #siGameCanvas {
+      width: 800px; height: 600px; max-width: 100%;
+      background: transparent;
+    }
+    #siInfo {
+      position: relative; z-index: 1;
+      width: min(800px, calc(100% - 2rem));
+      margin: 0.75rem auto 0;
+      font-size: 0.8rem; color: #cbd5e1;
+      text-align: center; letter-spacing: 0.04em;
+    }
+
     @keyframes starPulse {
       0%,100% { filter: brightness(1); }
       50% { filter: brightness(1.15); }
@@ -534,6 +561,14 @@
     <div class="completion-medals" id="completionMedals"></div>
     <button class="btn-restart" id="btnRestart">Play Again</button>
   </div>
+</div>
+
+<div id="spaceInvadersScreen" aria-hidden="true">
+  <div id="siStarfield"></div>
+  <div id="siGameContainer">
+    <canvas id="siGameCanvas"></canvas>
+  </div>
+  <div id="siInfo">Clear wave 1 to return to your planet mission. Use ← → and Space to play.</div>
 </div>
 
 <script>
@@ -707,7 +742,23 @@ const LEVEL_PLANET_ART = [
 ];
 
 let currentLevel = 0, isZoomedOut = false, selectedPlanetIdx = null, levelSolved = false, levelScores = [], gameComplete = false;
+/** Wrong planet picks per quiz level (index 0–4); max 3 per level before Space Invaders */
+const wrongPlanetChoicesByLevel = [0, 0, 0, 0, 0];
+let isRedirectingToInvaders = false;
 const completedLevels = new Set();
+const WRONG_CHOICE_LIMIT = 3;
+const SPACE_INVADERS_BASE = '../spaceinvaders-master/spaceinvaders-master';
+const SPACE_INVADERS_SCRIPTS = [
+  `${SPACE_INVADERS_BASE}/js/starfield.js`,
+  `${SPACE_INVADERS_BASE}/js/spaceinvaders.js`
+];
+let spaceInvadersLoaded = false;
+let spaceInvadersStarted = false;
+let spaceInvadersGame = null;
+let spaceInvadersStarfield = null;
+let spaceInvadersInputListenersInstalled = false;
+/** Planet quiz level index (0–4) to restore after clearing Space Invaders wave 1 */
+let quizLevelResumeAfterInvaders = 0;
 
 const viewport = document.getElementById('viewport');
 const sun = document.getElementById('sun');
@@ -733,6 +784,122 @@ const completionMedals = document.getElementById('completionMedals');
 const btnRestart = document.getElementById('btnRestart');
 const orbitSvg = document.getElementById('orbitSvg');
 const orbitRings = [1,2,3,4,5].map(i => document.getElementById('orbitRing' + i));
+const spaceInvadersScreen = document.getElementById('spaceInvadersScreen');
+const siStarfieldEl = document.getElementById('siStarfield');
+const siGameCanvas = document.getElementById('siGameCanvas');
+
+function ensureSpaceInvadersInputListeners() {
+  if (spaceInvadersInputListenersInstalled) return;
+  spaceInvadersInputListenersInstalled = true;
+  window.addEventListener('keydown', function onSpaceInvadersKeyDown(e) {
+    if (!spaceInvadersStarted || !spaceInvadersGame) return;
+    const keycode = e.which || window.event.keycode;
+    if (keycode === 37 || keycode === 39 || keycode === 32) e.preventDefault();
+    spaceInvadersGame.keyDown(keycode);
+  });
+  window.addEventListener('keyup', function onSpaceInvadersKeyUp(e) {
+    if (!spaceInvadersStarted || !spaceInvadersGame) return;
+    const keycode = e.which || window.event.keycode;
+    spaceInvadersGame.keyUp(keycode);
+  });
+  window.addEventListener('touchstart', function onSpaceInvadersTouchStart(e) {
+    if (!spaceInvadersStarted || !spaceInvadersGame) return;
+    spaceInvadersGame.touchstart(e);
+  }, false);
+  window.addEventListener('touchend', function onSpaceInvadersTouchEnd(e) {
+    if (!spaceInvadersStarted || !spaceInvadersGame) return;
+    spaceInvadersGame.touchend(e);
+  }, false);
+  window.addEventListener('touchmove', function onSpaceInvadersTouchMove(e) {
+    if (!spaceInvadersStarted || !spaceInvadersGame) return;
+    spaceInvadersGame.touchmove(e);
+  }, false);
+}
+
+function bindSpaceInvadersReturnHook() {
+  window.onSpaceInvadersWaveCleared = function (siGameInstance, waveLevel) {
+    if (waveLevel !== 1) return false;
+    queueMicrotask(returnToPlanetQuizAfterInvaders);
+    return true;
+  };
+}
+
+function returnToPlanetQuizAfterInvaders() {
+  window.onSpaceInvadersWaveCleared = null;
+  if (spaceInvadersStarfield) {
+    spaceInvadersStarfield.stop();
+    spaceInvadersStarfield = null;
+  }
+  if (spaceInvadersGame) {
+    spaceInvadersGame.stop();
+    spaceInvadersGame = null;
+  }
+  window.game = undefined;
+  siStarfieldEl.innerHTML = '';
+  spaceInvadersScreen.classList.remove('active');
+  spaceInvadersScreen.setAttribute('aria-hidden', 'true');
+  spaceInvadersStarted = false;
+  isRedirectingToInvaders = false;
+  wrongPlanetChoicesByLevel[quizLevelResumeAfterInvaders] = 0;
+  loadLevel(quizLevelResumeAfterInvaders);
+}
+
+function loadExternalScript(src) {
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector(`script[data-src="${src}"]`);
+    if (existing) {
+      if (existing.dataset.loaded === 'true') resolve();
+      else {
+        existing.addEventListener('load', () => resolve(), { once: true });
+        existing.addEventListener('error', () => reject(new Error(`Failed to load ${src}`)), { once: true });
+      }
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = true;
+    script.dataset.src = src;
+    script.addEventListener('load', () => {
+      script.dataset.loaded = 'true';
+      resolve();
+    }, { once: true });
+    script.addEventListener('error', () => reject(new Error(`Failed to load ${src}`)), { once: true });
+    document.body.appendChild(script);
+  });
+}
+
+async function launchSpaceInvadersMode() {
+  if (spaceInvadersStarted) return;
+  try {
+    if (!spaceInvadersLoaded) {
+      for (const src of SPACE_INVADERS_SCRIPTS) {
+        await loadExternalScript(src);
+      }
+      spaceInvadersLoaded = true;
+    }
+    bindSpaceInvadersReturnHook();
+    ensureSpaceInvadersInputListeners();
+    spaceInvadersScreen.classList.add('active');
+    spaceInvadersScreen.setAttribute('aria-hidden', 'false');
+
+    spaceInvadersStarfield = new Starfield();
+    spaceInvadersStarfield.initialise(siStarfieldEl);
+    spaceInvadersStarfield.start();
+
+    siGameCanvas.width = 800;
+    siGameCanvas.height = 600;
+
+    spaceInvadersGame = new Game();
+    spaceInvadersGame.initialise(siGameCanvas);
+    // Original spaceinvaders.js uses a global `game` in moveToState / pushState / popState / fireRocket.
+    window.game = spaceInvadersGame;
+    spaceInvadersGame.start();
+    spaceInvadersStarted = true;
+  } catch (err) {
+    isRedirectingToInvaders = false;
+    choiceResult.innerHTML += `<div class="result-wrong"><strong>Failed to load Space Invaders.</strong><br>${err.message}</div>`;
+  }
+}
 
 // ── Orbit config: radius in px (max size) and period in ms ──
 // These are the ACTUAL radii the planet centres travel.
@@ -934,6 +1101,7 @@ planetPanelClose.addEventListener('click', closePlanetPanel);
 
 btnChoose.addEventListener('click', () => {
   if (selectedPlanetIdx === null || levelSolved) return;
+  if (isRedirectingToInvaders) return;
   const planet = LEVELS[currentLevel].planets[selectedPlanetIdx];
   if (planet.best) {
     levelSolved = true; btnChoose.style.display = 'none';
@@ -943,7 +1111,14 @@ btnChoose.addEventListener('click', () => {
     levelScores.push({ name: planet.name, score: total, level: currentLevel + 1 });
     showHabitabilityResult(planet, total);
   } else {
+    wrongPlanetChoicesByLevel[currentLevel] += 1;
     choiceResult.innerHTML = `<div class="result-wrong"><strong>Not quite right.</strong><br>${planet.name} has significant habitability problems — keep exploring the other planets in this system.</div>`;
+    if (wrongPlanetChoicesByLevel[currentLevel] >= WRONG_CHOICE_LIMIT) {
+      isRedirectingToInvaders = true;
+      quizLevelResumeAfterInvaders = currentLevel;
+      choiceResult.innerHTML += `<div class="result-wrong"><strong>Too many wrong choices on this system.</strong><br>Switching to Space Invaders mode...</div>`;
+      setTimeout(() => { launchSpaceInvadersMode(); }, 700);
+    }
   }
 });
 
@@ -1015,6 +1190,8 @@ function buildCompletionScreen() {
 btnRestart.addEventListener('click', () => {
   completionScreen.classList.remove('visible');
   levelScores = []; gameComplete = false;
+  wrongPlanetChoicesByLevel.fill(0);
+  isRedirectingToInvaders = false;
   completedLevels.clear();
   systemSplash.classList.remove('visible');
   fadeOverlay.classList.add('fade-in');
