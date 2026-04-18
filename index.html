@@ -1,13 +1,445 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>devs-sesa-beginner-hackathon-2026</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <title>Re-Plan-It | Find the Perfect Alien Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #020617;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.2);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --star: #facc15;
+      --btn-bg: #0f172a;
+      --btn-hover: #1e293b;
+      --zoom-in: 4.25;
+      --zoom-duration: 1.45s;
+      --zoom-ease: cubic-bezier(0.45, 0, 0.15, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0b1120 0, #020617 55%, #000 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(2px 2px at 20% 30%, rgba(248, 250, 252, 0.55), transparent),
+        radial-gradient(1.5px 1.5px at 80% 70%, rgba(248, 250, 252, 0.35), transparent),
+        radial-gradient(1.5px 1.5px at 60% 20%, rgba(248, 250, 252, 0.45), transparent),
+        radial-gradient(2px 2px at 10% 80%, rgba(248, 250, 252, 0.45), transparent),
+        radial-gradient(1px 1px at 40% 60%, rgba(248, 250, 252, 0.5), transparent);
+      opacity: 0.75;
+      z-index: 0;
+    }
+
+    .viewport {
+      position: relative;
+      z-index: 1;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .system-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: scale(var(--zoom-in));
+      transform-origin: center center;
+      transition: transform var(--zoom-duration) var(--zoom-ease);
+      will-change: transform;
+    }
+
+    .viewport.is-zoomed-out .system-wrap {
+      transform: scale(1);
+    }
+
+    /* Solar system canvas (logical size); scaling happens on .system-wrap */
+    .system {
+      position: relative;
+      width: min(92vmin, 560px);
+      height: min(92vmin, 560px);
+      aspect-ratio: 1 / 1;
+    }
+
+    .sun {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 72px;
+      height: 72px;
+      margin-left: -36px;
+      margin-top: -36px;
+      border: none;
+      padding: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #fef9c3, #facc15, #b45309);
+      box-shadow:
+        0 0 36px rgba(250, 204, 21, 0.95),
+        0 0 72px rgba(251, 191, 36, 0.65),
+        0 0 120px rgba(251, 146, 60, 0.25);
+      cursor: pointer;
+      z-index: 10;
+      animation: starPulse 4s ease-in-out infinite;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .sun:hover {
+      transform: scale(1.05);
+      box-shadow:
+        0 0 48px rgba(250, 204, 21, 1),
+        0 0 90px rgba(251, 191, 36, 0.85),
+        0 0 140px rgba(251, 146, 60, 0.35);
+    }
+
+    .sun:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    .orbit {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      border-radius: 50%;
+      border: 1px dashed rgba(203, 213, 225, 0.45);
+      transform-origin: 50% 50%;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity calc(var(--zoom-duration) * 0.55) var(--zoom-ease);
+    }
+
+    .viewport.is-zoomed-out .orbit {
+      opacity: 1;
+    }
+
+    /* Center of each ring = center of .system: top-left at 50%/50% then pulled back by half size */
+    .orbit--1 {
+      width: 120px;
+      height: 120px;
+      margin-left: -60px;
+      margin-top: -60px;
+      animation: orbitRotate 14s linear infinite;
+    }
+
+    .orbit--2 {
+      width: 178px;
+      height: 178px;
+      margin-left: -89px;
+      margin-top: -89px;
+      animation: orbitRotate 22s linear infinite reverse;
+    }
+
+    .orbit--3 {
+      width: 238px;
+      height: 238px;
+      margin-left: -119px;
+      margin-top: -119px;
+      animation: orbitRotate 32s linear infinite;
+    }
+
+    .orbit--4 {
+      width: 310px;
+      height: 310px;
+      margin-left: -155px;
+      margin-top: -155px;
+      animation: orbitRotate 44s linear infinite reverse;
+    }
+
+    .orbit--5 {
+      width: 390px;
+      height: 390px;
+      margin-left: -195px;
+      margin-top: -195px;
+      animation: orbitRotate 58s linear infinite;
+      border-color: rgba(186, 198, 216, 0.32);
+    }
+
+    .planet {
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(15, 23, 42, 0.95);
+    }
+
+    .p1 { width: 12px; height: 12px; background: radial-gradient(circle at 30% 20%, #e2e8f0, #94a3b8, #475569); }
+    .p2 { width: 16px; height: 16px; background: radial-gradient(circle at 30% 20%, #bae6fd, #0ea5e9, #0369a1); }
+    .p3 { width: 20px; height: 20px; background: radial-gradient(circle at 30% 20%, #fcd34d, #f59e0b, #b45309); }
+    .p4 { width: 18px; height: 18px; background: radial-gradient(circle at 30% 20%, #fecaca, #f97316, #7c2d12); }
+    .p5 { width: 14px; height: 14px; background: radial-gradient(circle at 30% 20%, #bbf7d0, #22c55e, #166534); }
+
+    .landing {
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      transform: translate(-50%, calc(-50% - min(22vmin, 130px)));
+      text-align: center;
+      z-index: 5;
+      pointer-events: none;
+      width: min(92vw, 28rem);
+      transition:
+        opacity calc(var(--zoom-duration) * 0.55) ease,
+        transform calc(var(--zoom-duration) * 0.85) var(--zoom-ease);
+    }
+
+    .viewport.is-zoomed-out .landing {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% - min(34vmin, 200px))) scale(0.92);
+      pointer-events: none;
+    }
+
+    .title {
+      font-size: clamp(2rem, 7vw, 3.25rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      text-shadow: 0 0 40px rgba(15, 23, 42, 0.9);
+    }
+
+    .title span.re { color: var(--accent); }
+    .title span.plan { color: #f97316; }
+    .title span.it { color: #22c55e; }
+
+    .subtitle {
+      margin-top: 0.65rem;
+      font-size: clamp(0.85rem, 2.4vw, 1rem);
+      color: var(--text-muted);
+      line-height: 1.45;
+      max-width: 24rem;
+      margin-inline: auto;
+      text-shadow: 0 1px 18px rgba(0, 0, 0, 0.85);
+    }
+
+    .tap-hint {
+      margin-top: 1rem;
+      font-size: 0.78rem;
+      color: rgba(156, 163, 175, 0.85);
+      letter-spacing: 0.04em;
+    }
+
+    .tap-hint strong {
+      color: var(--star);
+      font-weight: 600;
+    }
+
+    .zoom-hint {
+      position: absolute;
+      bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease 0.35s;
+      white-space: nowrap;
+    }
+
+    .viewport.is-zoomed-out .zoom-hint {
+      opacity: 1;
+    }
+
+    .dock {
+      position: absolute;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition:
+        opacity calc(var(--zoom-duration) * 0.45) ease 0.1s,
+        transform calc(var(--zoom-duration) * 0.55) var(--zoom-ease) 0.1s;
+      z-index: 20;
+      bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
+      left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      justify-content: center;
+      max-width: min(94vw, 32rem);
+      padding-inline: 0.75rem;
+    }
+
+    .viewport.is-zoomed-out .dock {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .btn-primary {
+      position: relative;
+      padding: 0.75rem 1.35rem;
+      border-radius: 999px;
+      border: 1px solid var(--accent-soft);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.3), transparent),
+                  var(--btn-bg);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      box-shadow: 0 0 20px rgba(15, 23, 42, 0.9);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.45), transparent),
+                  var(--btn-hover);
+      box-shadow: 0 0 28px rgba(56, 189, 248, 0.3);
+    }
+
+    .btn-secondary {
+      padding: 0.75rem 1.1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: rgba(15, 23, 42, 0.75);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text-main);
+      border-color: rgba(148, 163, 184, 0.8);
+    }
+
+    @keyframes starPulse {
+      0%, 100% {
+        box-shadow:
+          0 0 36px rgba(250, 204, 21, 0.95),
+          0 0 72px rgba(251, 191, 36, 0.65),
+          0 0 120px rgba(251, 146, 60, 0.25);
+      }
+      50% {
+        box-shadow:
+          0 0 48px rgba(250, 204, 21, 1),
+          0 0 96px rgba(251, 191, 36, 0.8),
+          0 0 150px rgba(251, 146, 60, 0.35);
+      }
+    }
+
+    @keyframes orbitRotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .system-wrap {
+        transition-duration: 0.01ms;
+      }
+      .landing,
+      .dock,
+      .zoom-hint {
+        transition-duration: 0.01ms;
+      }
+      .orbit {
+        transition-duration: 0.01ms;
+      }
+      .orbit,
+      .sun {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" aria-hidden="true"></div>
+
+  <div class="viewport" id="viewport">
+    <div class="landing">
+      <div class="title">
+        <span class="re">RE</span>
+        <span class="plan">PLAN</span>
+        <span class="it">IT</span>
+      </div>
+      <p class="subtitle">
+        Find the perfect alien home — click the star to pull back and see the whole system.
+      </p>
+      <p class="tap-hint"><strong>Tip:</strong> Click the star again to return to the landing view.</p>
+    </div>
+
+    <div class="system-wrap" id="systemWrap">
+      <div class="system" aria-hidden="true">
+        <button type="button" class="sun" id="sun" aria-label="Zoom: show full star system"></button>
+
+        <div class="orbit orbit--1"><div class="planet p1"></div></div>
+        <div class="orbit orbit--2"><div class="planet p2"></div></div>
+        <div class="orbit orbit--3"><div class="planet p3"></div></div>
+        <div class="orbit orbit--4"><div class="planet p4"></div></div>
+        <div class="orbit orbit--5"><div class="planet p5"></div></div>
+      </div>
+    </div>
+
+    <p class="zoom-hint" id="zoomHint">Solar system view — click the sun to zoom back in</p>
+
+    <div class="dock">
+      <button type="button" class="btn-primary" id="playButton">Start Orbit</button>
+      <button type="button" class="btn-secondary" id="howToButton">How to play</button>
+    </div>
+  </div>
+
+  <script>
+    const viewport = document.getElementById('viewport');
+    const sun = document.getElementById('sun');
+    const playButton = document.getElementById('playButton');
+    const howToButton = document.getElementById('howToButton');
+
+    function setZoomedOut(on) {
+      viewport.classList.toggle('is-zoomed-out', on);
+      sun.setAttribute(
+        'aria-label',
+        on ? 'Zoom in: return to landing view' : 'Zoom out: show full star system'
+      );
+    }
+
+    sun.addEventListener('click', () => {
+      setZoomedOut(!viewport.classList.contains('is-zoomed-out'));
+    });
+
+    playButton.addEventListener('click', () => {
+      setZoomedOut(true);
+      console.log('Start Orbit → system view');
+    });
+
+    howToButton.addEventListener('click', () => {
+      console.log('How to Play → show tutorial (TODO)');
+    });
+  </script>
+</body>
 </html>
