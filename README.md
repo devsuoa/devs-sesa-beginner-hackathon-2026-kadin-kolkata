@@ -1,159 +1,38 @@
-# DEVS x SESA Beginner Hackathon 2026
+# Re-Plan-It
+A cosmic visual novel about finding the perfect planet for a variety of aliens.
+# Overview
+Re-Plan-It is an interactive browser-based game where players explore fictional star systems to determine which planets fall within the habitable zone for a specific species. The player must read planet descriptions, analyse star types, and choose the correct world for the alien civilisation to live on.
 
-<p align="center">
-  <img width="450" alt="header" src="public/read-me-header.png" />
-</p>
+# Core Gameplay Loop
 
-<p align="center">
-  <img src="https://img.shields.io/badge/HTML-E34F26?logo=html5&logoColor=white&style=for-the-badge" />
-  <img src="https://img.shields.io/badge/CSS-1572B6?logo=css&logoColor=white&style=for-the-badge&v=1" />
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white&style=for-the-badge" />
-  <img src="https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black&style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Node.js-25.x-green?logo=node.js&logoColor=white&style=for-the-badge" />
-</p>
+    Landing Page
 
-## 💻 About
+        Displays the game title and a central star.
 
-Hi 😊! This is the template repository for the DEVS x SESA Beginners Hackathon 2026. You’re welcome to make any changes, and you don’t have to stick with everything provided here. This is simply a starter using HTML/CSS/TypeScript that you can build on.
+        A Play button launches the experience.
 
-If you have any questions, don’t hesitate to ask for help! Otherwise, we wish you all the best and hope you have a great time ❤️!
+    Orbit View Transition
 
-## 🚀 Getting Started
+        Clicking Play zooms out to reveal a full star system.
 
-**1. Clone the Repository**
+        Multiple planets orbit the star, each with unique traits.
 
-```bash
-git clone <your-repo-url>
-```
+    How to Play
 
-**2. Open the Project**
+        A friendly alien appears in a dialogue box.
 
-Open the folder in your preferred editor.
+        They explain their needs in a cryptic or humorous way.
 
-**3. Install Dependencies**
+        The player must interpret these clues.
 
-Open the terminal inside your editor (or an external terminal!) and run the following command from the root directory:
+    Planet Selection
 
-```bash
-npm install
-```
+        Players inspect planet descriptions (temperature, atmosphere, distance from star, etc.).
 
-**4. Run**
+        They choose the planet that best matches the alien’s requirements.
 
-From the same directory, run the following command to start the app. You can then access it in your browser at the URL shown in the terminal (usually `http://localhost:5173`).
+    Progression
 
-```bash
-npm run dev
-```
+        Correct choice: advance to the next level.
 
-## ⚛️ React Fundamentals
-
-### Components
-
-Reusable components live in the `src/components/` folder. Components are simply functions that return JSX - which is just HTML-like syntax that describes what to show on screen.
-
-A sample component that takes in a string/text and displays it would look something like this:
-
-```typescript
-function MyComponent({ text }: { text: string }) {
-  return (
-    <div>
-      <h1>{text}</h1>
-    </div>
-  )
-}
-
-export default MyComponent
-```
-
-#### Styling
-
-To style a component, create a `.module.css` file next to it and import it. For example, in `MyComponent.module.css`:
-
-```css
-.title {
-  color: coral;
-}
-```
-
-Then we can use it in our component with `className={styles.title}`, to style our text coral:
-
-```typescript
-import styles from "./MyComponent.module.css"
-
-function MyComponent({ text }: { text: string }) {
-  return <h1 className={styles.title}>{text}</h1>
-}
-```
-
----
-
-### Pages
-
-Pages live in the `src/pages/` folder, each in its own folder (i.e. `src/pages/home/`). Pages are just components, however they often contain multiple components! Think of a page being a webpage that embeds multiple components!
-
-For example, a page could use the `MyComponent` component above twice with different text:
-
-```typescript
-import MyComponent from "../../components/MyComponent"
-
-function MyPage() {
-  return (
-    <div>
-      <MyComponent text="Hello!" />
-      <MyComponent text="Welcome to my website!" />
-    </div>
-  )
-}
-
-export default MyPage
-```
-
-This creates a webpage that displays "Hello!" and "Welcome to my website!" in coral text 🪸
-
-## 🌲 Project Structure
-
-#### `main.tsx`
-
-This file largely doesn't need to be touched! It's the entry point of the app 😄.
-
----
-
-#### `App.tsx`
-
-This is where routing lives. It maps URLs to pages. `/` shows `Home`, `/about` shows `About`.
-
-If you want to add a new page, this is the place to do it! Create a new folder in `pages/`, import it here, and add a new <Route> pointing to it.
-
-```typescript
-import PageName from "./pages/page-name/PageName";
-
-// Then inside <Routes>
-<Route path="/your-path" element={<PageName />} />
-```
-
----
-
-#### `Home.tsx`
-
-The landing page. Displays the DEVS x SESA banner with the logo, three info cards, and a button to the API example page.
-
----
-
-#### `ApiExample.tsx`
-
-A page that demonstrates how to fetch data from an API. It uses the [PokeAPI](https://pokeapi.co/) to fetch a random Pokemon when a button is pressed. The left side shows the steps, the right side lets you try it out.
-
----
-
-#### `Button.tsx`
-
-A reusable pill-shaped button component that links to a page. Takes `text` and `to` as input.
-
-```typescript
-<Button text="Click Me" to="/some-page" />
-```
-
-## 🌏 Deployment
-
-Your repository is automatically deployed via GitHub Pages. This means that it is live, and every time your main branch is updated, the site will be rebuilt and redeployed automatically!
+        Incorrect choice: retry with a hint.
