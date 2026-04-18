@@ -99,7 +99,10 @@
       border: 1.5px solid rgba(148,163,184,0.4);
       background: transparent;
       transition: all 0.4s ease;
+      cursor: default;
     }
+    .hud-dot.clickable { cursor: pointer; }
+    .hud-dot.locked { opacity: 0.45; }
     .hud-dot.done { background: var(--accent3); border-color: var(--accent3); box-shadow: 0 0 8px rgba(34,197,94,0.6); }
     .hud-dot.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 8px rgba(56,189,248,0.6); }
 
@@ -704,6 +707,7 @@ const LEVEL_PLANET_ART = [
 ];
 
 let currentLevel = 0, isZoomedOut = false, selectedPlanetIdx = null, levelSolved = false, levelScores = [], gameComplete = false;
+const completedLevels = new Set();
 
 const viewport = document.getElementById('viewport');
 const sun = document.getElementById('sun');
@@ -800,17 +804,45 @@ function init() { buildHudDots(); loadLevel(0, true); startOrbitLoop(); }
 function buildHudDots() {
   hudDots.innerHTML = '';
   for (let i = 0; i < 5; i++) {
-    const d = document.createElement('div'); d.className = 'hud-dot'; d.id = `hudDot${i}`; hudDots.appendChild(d);
+    const d = document.createElement('div');
+    d.className = 'hud-dot locked';
+    d.id = `hudDot${i}`;
+    d.setAttribute('role', 'button');
+    d.setAttribute('aria-label', `Go to level ${i + 1}`);
+    d.tabIndex = 0;
+    d.addEventListener('click', () => trySelectLevel(i));
+    d.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        trySelectLevel(i);
+      }
+    });
+    hudDots.appendChild(d);
   }
+}
+
+function trySelectLevel(levelIdx) {
+  const highestCompleted = completedLevels.size ? Math.max(...completedLevels) : -1;
+  const highestAllowed = Math.min(4, highestCompleted + 1);
+  if (levelIdx > highestAllowed) return;
+  if (levelIdx === currentLevel) return;
+  loadLevel(levelIdx);
 }
 
 function updateHud() {
   hudLabel.textContent = `Level ${currentLevel + 1} of 5`;
+  const highestCompleted = completedLevels.size ? Math.max(...completedLevels) : -1;
+  const highestAllowed = Math.min(4, highestCompleted + 1);
   for (let i = 0; i < 5; i++) {
     const d = document.getElementById(`hudDot${i}`);
-    d.classList.remove('done', 'active');
-    if (i < currentLevel) d.classList.add('done');
-    else if (i === currentLevel) d.classList.add('active');
+    d.classList.remove('done', 'active', 'clickable', 'locked');
+    const done = completedLevels.has(i);
+    const selectable = i <= highestAllowed;
+    if (done) d.classList.add('done');
+    if (selectable) d.classList.add('clickable');
+    else d.classList.add('locked');
+    if (i === currentLevel) d.classList.add('active');
+    d.setAttribute('aria-disabled', selectable ? 'false' : 'true');
   }
 }
 
@@ -905,6 +937,8 @@ btnChoose.addEventListener('click', () => {
   const planet = LEVELS[currentLevel].planets[selectedPlanetIdx];
   if (planet.best) {
     levelSolved = true; btnChoose.style.display = 'none';
+    completedLevels.add(currentLevel);
+    updateHud();
     const total = Math.round(planet.reasons.reduce((s, r) => s + r.val, 0) / planet.reasons.length);
     levelScores.push({ name: planet.name, score: total, level: currentLevel + 1 });
     showHabitabilityResult(planet, total);
@@ -953,6 +987,8 @@ function transitionToNextLevel() {
 function dismissSplashOnce() { systemSplash.classList.remove('visible'); }
 
 function triggerCompletion() {
+  for (let i = 0; i < 5; i++) completedLevels.add(i);
+  updateHud();
   for (let i = 0; i < 5; i++) {
     document.getElementById(`hudDot${i}`).classList.add('done');
     document.getElementById(`hudDot${i}`).classList.remove('active');
@@ -979,6 +1015,7 @@ function buildCompletionScreen() {
 btnRestart.addEventListener('click', () => {
   completionScreen.classList.remove('visible');
   levelScores = []; gameComplete = false;
+  completedLevels.clear();
   systemSplash.classList.remove('visible');
   fadeOverlay.classList.add('fade-in');
   setTimeout(() => { loadLevel(0, true); fadeOverlay.classList.remove('fade-in'); }, 600);
