@@ -23,7 +23,8 @@ export const levels = [
         weather: null,
         ozoneLayer: false,
         description: "A small rocky chunk tumbling through the system, scorched by Solara's rays.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "meteor"
       },
       {
         id: "1-2",
@@ -37,7 +38,8 @@ export const levels = [
         weather: "Moderate",
         ozoneLayer: false,
         description: "A dry, dusty world with small scattered lakes and harsh sunlight.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "terrestrial_desert"
       },
       {
         id: "1-3",
@@ -51,7 +53,8 @@ export const levels = [
         weather: "Mild",
         ozoneLayer: true,
         description: "A lush, green world with vast forests and calm seas.",
-        bestAnswer: true
+        bestAnswer: true,
+        artKey: "terrestrial_green"
       },
       {
         id: "1-4",
@@ -65,7 +68,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "A frozen world entirely encased in thick ice sheets.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "ice"
       },
       {
         id: "1-5",
@@ -80,7 +84,8 @@ export const levels = [
         weather: null,
         ozoneLayer: false,
         description: "A city-sized rock with no atmosphere or water, drifting aimlessly.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "meteor"
       }
     ]
   },
@@ -107,7 +112,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "A hot, heavy world with a suffocating CO2 atmosphere and violent dust storms.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "terrestrial_red"
       },
       {
         id: "2-2",
@@ -121,7 +127,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "A small gas planet with toxic yellow clouds and crushing pressure.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "gas_yellow"
       },
       {
         id: "2-3",
@@ -135,7 +142,8 @@ export const levels = [
         weather: "Moderate",
         ozoneLayer: false,
         description: "Decent gravity and size, but lacks oxygen and has very little water.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "terrestrial_desert"
       },
       {
         id: "2-4",
@@ -149,7 +157,8 @@ export const levels = [
         weather: "Moderate",
         ozoneLayer: true,
         description: "A warm humid world with frequent rainstorms but stable enough conditions for life.",
-        bestAnswer: true
+        bestAnswer: true,
+        artKey: "terrestrial_green"
       },
       {
         id: "2-5",
@@ -163,7 +172,8 @@ export const levels = [
         weather: "Moderate",
         ozoneLayer: false,
         description: "A cold but somewhat promising world — thin air makes it a tough call.",
-        bestAnswer: true
+        bestAnswer: true,
+        artKey: "terrestrial_cold"
       },
       {
         id: "2-6",
@@ -178,7 +188,8 @@ export const levels = [
         weather: null,
         ozoneLayer: false,
         description: "A moon-sized rock with deep craters and no signs of anything useful.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "meteor"
       }
     ]
   },
@@ -205,7 +216,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "A volcanic hellscape with rivers of lava and acid rain.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "volcanic"
       },
       {
         id: "3-2",
@@ -220,7 +232,8 @@ export const levels = [
         weather: null,
         ozoneLayer: false,
         description: "A small rock being slowly vaporized by Caelrix's intense radiation.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "meteor"
       },
       {
         id: "3-3",
@@ -234,7 +247,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "Scorched and heavy with a thick CO2 blanket trapping heat.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "terrestrial_red"
       },
       {
         id: "3-4",
@@ -248,7 +262,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "Hot and dry with a breathable but thin atmosphere. Survivable, barely.",
-        bestAnswer: true
+        bestAnswer: true,
+        artKey: "terrestrial_desert"
       },
       {
         id: "3-5",
@@ -263,7 +278,8 @@ export const levels = [
         weather: null,
         ozoneLayer: false,
         description: "A city-sized chunk of scorched rock with deep radiation burns across its surface.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "meteor"
       },
       {
         id: "3-6",
@@ -277,7 +293,8 @@ export const levels = [
         weather: "Moderate",
         ozoneLayer: true,
         description: "Cold but shielded. Low gravity makes it tough, but it's the most promising option here.",
-        bestAnswer: true
+        bestAnswer: true,
+        artKey: "terrestrial_cold"
       },
       {
         id: "3-7",
@@ -291,7 +308,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "A massive gas giant with no solid surface and crushing gravity.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "gas_giant"
       }
     ]
   },
@@ -318,7 +336,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "Tidally locked — one side is scorching, the other frozen. The thin habitable band in between is survivable but unstable.",
-        bestAnswer: true
+        bestAnswer: true,
+        artKey: "terrestrial_half"
       },
       {
         id: "4-2",
@@ -332,7 +351,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "The dark side of a tidally locked planet — perpetually frozen and lightless.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "terrestrial_cold"
       },
       {
         id: "4-3",
@@ -346,7 +366,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "Heated from within by volcanic activity rather than the star. Toxic and crushing.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "volcanic"
       },
       {
         id: "4-4",
@@ -360,7 +381,8 @@ export const levels = [
         weather: "Moderate",
         ozoneLayer: false,
         description: "Reasonable temperature and gravity, but the CO2 atmosphere makes it unbreathable without equipment.",
-        bestAnswer: true
+        bestAnswer: true,
+        artKey: "terrestrial_desert"
       },
       {
         id: "4-5",
@@ -374,7 +396,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "Constantly bombarded by solar flares from Rubrik. Atmosphere is being slowly stripped away.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "terrestrial_red"
       },
       {
         id: "4-6",
@@ -388,7 +411,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "An ocean world completely frozen over. Possibly liquid beneath the ice, but the surface is uninhabitable.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "ice"
       },
       {
         id: "4-7",
@@ -403,7 +427,8 @@ export const levels = [
         weather: null,
         ozoneLayer: false,
         description: "A large frozen rock drifting at the edge of the system, far from Rubrik's warmth.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "meteor"
       },
       {
         id: "4-8",
@@ -418,7 +443,8 @@ export const levels = [
         weather: null,
         ozoneLayer: false,
         description: "A tiny frozen pebble lost in the outer reaches of the system.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "meteor"
       }
     ]
   },
@@ -446,7 +472,8 @@ export const levels = [
         weather: null,
         ozoneLayer: false,
         description: "A completely barren rock with no atmosphere, stripped clean by the radiation of two stars.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "meteor"
       },
       {
         id: "5-2",
@@ -460,7 +487,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "A heavy, hot world baking under two suns with a runaway greenhouse effect.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "terrestrial_red"
       },
       {
         id: "5-3",
@@ -474,7 +502,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "The most Earth-like in the system, but gravitational stress from both stars causes constant earthquakes and atmospheric instability.",
-        bestAnswer: true
+        bestAnswer: true,
+        artKey: "terrestrial_green"
       },
       {
         id: "5-4",
@@ -489,7 +518,8 @@ export const levels = [
         weather: null,
         ozoneLayer: false,
         description: "A medium rock caught in a chaotic figure-eight orbit between both stars.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "meteor"
       },
       {
         id: "5-5",
@@ -503,7 +533,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "Passes between both stars in its orbit, swinging between freezing and scorching every few months.",
-        bestAnswer: true
+        bestAnswer: true,
+        artKey: "terrestrial_cold"
       },
       {
         id: "5-6",
@@ -517,7 +548,8 @@ export const levels = [
         weather: "Moderate",
         ozoneLayer: false,
         description: "Stable enough gravity and temperature, but no oxygen in the atmosphere makes long term survival dependent on technology.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "terrestrial_desert"
       },
       {
         id: "5-7",
@@ -531,7 +563,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "A volcanic nightmare world constantly reshaped by eruptions triggered by the binary stars' tidal forces.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "volcanic"
       },
       {
         id: "5-8",
@@ -545,7 +578,8 @@ export const levels = [
         weather: "Extreme",
         ozoneLayer: false,
         description: "A massive gas giant with a swirling storm the size of a continent that has lasted for centuries.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "gas_giant"
       },
       {
         id: "5-9",
@@ -560,7 +594,8 @@ export const levels = [
         weather: null,
         ozoneLayer: false,
         description: "A moon-sized rock being torn apart by the gravitational pull of both stars.",
-        bestAnswer: false
+        bestAnswer: false,
+        artKey: "meteor"
       }
     ]
   }
