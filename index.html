@@ -478,6 +478,192 @@
       .system-wrap, .landing-top, .landing-bottom, .zoom-hint, .planet-panel, .orbit, .planet { transition-duration: .01ms; }
       .orbit, .sun, .planet-counter { animation: none; }
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DIALOGUE SYSTEM — visual-novel style
+       Search for: DIALOGUE_SYSTEM to find all related blocks
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* ── Dialogue box ── */
+    #dialogueBox {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      pointer-events: none;
+      transform: translateY(100%);
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #dialogueBox.dlg--visible {
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Alien portrait strip above the box */
+    #dialoguePortrait {
+      align-self: flex-start;
+      margin-left: 2.5rem;
+      margin-bottom: -2px;
+      width: 100px; height: 100px;
+      border-radius: 12px 12px 0 0;
+      object-fit: cover;
+      border: 2px solid rgba(56,189,248,0.55);
+      border-bottom: none;
+      background: rgba(10,18,38,0.9);
+      box-shadow: 0 -4px 20px rgba(56,189,248,0.2);
+      display: none; /* shown when src is set */
+    }
+    #dialoguePortrait.dlg-portrait--visible { display: block; }
+
+    /* Main panel */
+    #dialoguePanel {
+      background: rgba(5, 12, 28, 0.97);
+      border-top: 2px solid rgba(56,189,248,0.55);
+      backdrop-filter: blur(18px);
+      padding: 1.25rem 2.5rem 1.5rem;
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+    }
+
+    #dialogueSpeaker {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    #dialogueText {
+      font-size: 0.97rem;
+      line-height: 1.65;
+      color: #e2e8f0;
+      min-height: 3.5rem;
+    }
+
+    /* Blinking "click to continue" chevron */
+    #dialogueContinue {
+      position: absolute;
+      bottom: 1.1rem; right: 2rem;
+      font-size: 0.75rem;
+      color: rgba(56,189,248,0.7);
+      letter-spacing: 0.1em;
+      animation: dlgBlink 1.3s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes dlgBlink { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+    /* Skip button */
+    #dialogueSkip {
+      position: fixed;
+      bottom: 155px; right: 1.5rem;
+      z-index: 501;
+      background: rgba(10,18,38,0.85);
+      border: 1px solid rgba(148,163,184,0.35);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.75rem;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, opacity 0.3s;
+      opacity: 0; pointer-events: none;
+    }
+    #dialogueSkip.dlg--visible { opacity: 1; pointer-events: auto; }
+    #dialogueSkip:hover { color: var(--text-main); border-color: rgba(148,163,184,0.6); }
+
+    /* ── Alien HUD button (top-right, shown after dialogue ends) ── */
+    #alienHudBtn {
+      position: fixed;
+      top: max(3.5rem, calc(env(safe-area-inset-top,0px) + 3.5rem));
+      right: 1.25rem;
+      z-index: 51;
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      border: 2px solid rgba(56,189,248,0.55);
+      background: rgba(5,12,28,0.9);
+      overflow: hidden;
+      cursor: pointer;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.2s ease, border-color 0.2s;
+      box-shadow: 0 0 12px rgba(56,189,248,0.25);
+    }
+    #alienHudBtn.ahb--visible { opacity: 1; pointer-events: auto; }
+    #alienHudBtn:hover { transform: scale(1.1); border-color: var(--accent); }
+    #alienHudBtn img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    /* Fallback emoji when no image */
+    #alienHudBtn .ahb-emoji {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    /* ── Checklist panel ── */
+    #alienChecklist {
+      position: fixed;
+      top: max(6.5rem, calc(env(safe-area-inset-top,0px) + 6.5rem));
+      right: 1.25rem;
+      z-index: 51;
+      width: min(260px, calc(100vw - 2.5rem));
+      background: rgba(5,12,28,0.96);
+      border: 1px solid rgba(56,189,248,0.35);
+      border-radius: 10px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateY(-6px);
+      overflow: hidden;
+    }
+    #alienChecklist.acl--visible {
+      opacity: 1; pointer-events: auto;
+      transform: translateY(0);
+    }
+    #alienChecklist.acl--collapsed #aclItems { display: none; }
+
+    #aclHeader {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.6rem 0.85rem;
+      border-bottom: 1px solid rgba(56,189,248,0.2);
+      cursor: pointer;
+    }
+    #aclHeaderTitle {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.6rem; letter-spacing: 0.18em;
+      color: var(--accent); text-transform: uppercase;
+    }
+    #aclToggle {
+      font-size: 0.7rem; color: var(--text-muted);
+      background: none; border: none; cursor: pointer;
+      padding: 0; line-height: 1;
+      transition: transform 0.2s;
+    }
+    #alienChecklist.acl--collapsed #aclToggle { transform: rotate(180deg); }
+
+    #aclItems {
+      padding: 0.6rem 0.85rem 0.85rem;
+      display: flex; flex-direction: column; gap: 0.45rem;
+    }
+    .acl-item {
+      display: flex; align-items: flex-start; gap: 0.5rem;
+      font-size: 0.78rem; color: #cbd5e1; line-height: 1.4;
+    }
+    .acl-bullet {
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+      font-size: 0.85rem;
+    }
+    /* END DIALOGUE_SYSTEM CSS */
   </style>
 </head>
 <body>
@@ -550,6 +736,43 @@
 
   <p class="zoom-hint" id="zoomHint">Solar system view —> click the star to zoom back in</p>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     DIALOGUE_SYSTEM — HTML elements
+     Search for: DIALOGUE_SYSTEM to find all related blocks
+════════════════════════════════════════════════════════════════ -->
+
+<!-- Alien portrait (sits above the dialogue panel) -->
+<img id="dialoguePortrait" src="" alt="Alien guide" />
+
+<!-- Main dialogue box — click anywhere on panel to advance -->
+<div id="dialogueBox" role="dialog" aria-live="polite" aria-label="Alien dialogue">
+  <div id="dialoguePanel">
+    <div id="dialogueSpeaker"></div>
+    <div id="dialogueText"></div>
+    <div id="dialogueContinue">▼ click to continue</div>
+  </div>
+</div>
+
+<!-- Skip button — visible whenever dialogue is active -->
+<button id="dialogueSkip" type="button">Skip ✕</button>
+
+<!-- Alien HUD icon (top-right, persists after dialogue) -->
+<button id="alienHudBtn" type="button" aria-label="Replay alien dialogue" title="Talk to your alien guide">
+  <div class="ahb-emoji">👾</div>
+</button>
+
+<!-- Checklist panel (below alien HUD icon) -->
+<div id="alienChecklist" aria-label="Mission checklist">
+  <div id="aclHeader">
+    <span id="aclHeaderTitle">Mission Notes</span>
+    <button id="aclToggle" type="button" aria-label="Toggle checklist">▲</button>
+  </div>
+  <div id="aclItems">
+    <!-- Items populated by JS from DIALOGUE_DATA -->
+  </div>
+</div>
+<!-- END DIALOGUE_SYSTEM HTML -->
 
 <div id="completionScreen">
   <div class="completion-stars" id="completionStars"></div>
@@ -1213,6 +1436,345 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 //test
 init();
+
+/* ═══════════════════════════════════════════════════════════════════
+   DIALOGUE_SYSTEM — JavaScript
+   Search for: DIALOGUE_SYSTEM to find all related blocks
+
+   HOW TO ADD YOUR DIALOGUE:
+   ─────────────────────────
+   Each level has an object in DIALOGUE_DATA keyed by level index (0–4).
+   Each level object has:
+     • alienImage  – path to the alien image file, e.g. "aliens/level1.png"
+                     Leave as "" to use the default emoji fallback.
+     • alienName   – name shown above the dialogue text
+     • intro       – array of strings shown ONCE on first load.
+                     The HUD icon replay skips these.
+     • dialogue    – array of strings shown after intro (and when replaying).
+     • checklist   – array of { bullet, text } objects shown in the panel.
+                     bullet can be any emoji or symbol: "🔍", "⚠️", "✅", etc.
+
+   FIND & REPLACE HELPERS:
+     To jump to Level 1 intro:   search →  LEVEL1_INTRO
+     To jump to Level 1 dialogue: search → LEVEL1_DIALOGUE
+     To jump to Level 1 checklist: search → LEVEL1_CHECKLIST
+     (Same pattern for LEVEL2_, LEVEL3_, LEVEL4_, LEVEL5_)
+════════════════════════════════════════════════════════════════════ */
+
+const DIALOGUE_DATA = [
+
+  // ── Level 1 (index 0) — Green Mizorpians ──────────────────────
+  {
+    alienImage: "/src/data/images/alien1.png",                   // ← LEVEL1_IMAGE
+    alienName:  "Green Mizorpian",              // ← LEVEL1_NAME
+
+    // LEVEL1_INTRO — shown once, skipped on replay
+    intro: [
+      "zwdzswz-*$--s** Hello, hello? Is the translator working?",
+      "Ah, yes, hi, we are the Green Mizorpians, and we are looking for a new planet to live on.",
+      "We picked out this galaxy, but we are unsure where to go. Since you have such a good planet, Earth, we are sure you can help us.",
+      "We require a planet like yours — vast with oceans, but a bit colder than your world.",
+      "We have conducted intensive research on each of these planets' environments, but we can't decide what best suits our needs.",
+      "Click each of the planets to see what we have found. Then, when ready to submit, be warned — if we don't like it, there will be consequences."
+    ],
+
+    // LEVEL1_DIALOGUE — shown after intro, replayed via HUD icon
+    dialogue: [
+      "We need a planet with vast oceans — water is essential to us.",
+      "It should be a bit colder than Earth. Not frozen, just… refreshingly cool.",
+      "Click the planets to review what our researchers have found, then make your choice."
+    ],
+
+    // LEVEL1_CHECKLIST — shown in the side panel
+    checklist: [
+      { bullet: "🌊", text: "Vast oceans — water coverage is a must" },
+      { bullet: "❄️", text: "Cooler than Earth — below ~14 °C average preferred" },
+      { bullet: "🌬️", text: "Breathable atmosphere required" },
+      { bullet: "⚠️", text: "Wrong choice = consequences. Choose carefully." }
+    ]
+  },
+
+  // ── Level 2 (index 1) — Purple Mizorpians ─────────────────────
+  {
+    alienImage: "/src/data/images/alien2.png",                   // ← LEVEL2_IMAGE
+    alienName:  "Purple Mizorpian",             // ← LEVEL2_NAME
+
+    // LEVEL2_INTRO
+    intro: [
+      "Hello, can you hear me? We heard of your wonders at the Solara System and how you helped save our fellow Green Mizorpians.",
+      "Unfortunately, we Purple Mizorpians also need your help. Our old planet is dying.",
+      "The atmosphere is thinning, making our planet too cold for us and driving us toward extinction.",
+      "You should know that we do not need water like you humans do — the sun suffices us with energy that is captured through our powerful antennas.",
+      "Anyway, we have found a new galaxy that we named The Auron System, that suits a lot of our needs.",
+      "However, we are unsure which planet would be best for us to inhabit. Please, pick a suitable planet for us."
+    ],
+
+    // LEVEL2_DIALOGUE
+    dialogue: [
+      "Remember — we do not need water. Our antennas harvest energy directly from sunlight.",
+      "What we need is warmth and a stable atmosphere. Our planet was lost to the cold.",
+      "Find us somewhere our antennas can drink in the light. That is all we ask."
+    ],
+
+    // LEVEL2_CHECKLIST
+    checklist: [
+      { bullet: "☀️", text: "Sunlight is our energy source — no water needed" },
+      { bullet: "🌡️", text: "Warmer temperatures preferred — we fled the cold" },
+      { bullet: "📡", text: "Our antennas need an open atmosphere to function" },
+      { bullet: "🌬️", text: "Stable atmosphere is essential" }
+    ]
+  },
+
+  // ── Level 3 (index 2) — Electric Mizorpians ───────────────────
+  {
+    alienImage: "/src/data/images/alien3.png",                   // ← LEVEL3_IMAGE
+    alienName:  "Electric Mizorpian",           // ← LEVEL3_NAME
+
+    // LEVEL3_INTRO
+    intro: [
+      "Hey, you — we are the Electric Mizorpians. Yes, another race of Mizorpians.",
+      "We found a new solar system, the Diaxis System, and you are going to help us take over one of its planets.",
+      "In recent years, our population has skyrocketed. There are so many of us now that the storms can't even supply us all.",
+      "Now we have no choice but to find a new planet to inhabit, or else we all risk starving.",
+      "Unlike other Mizorpians, we need electricity for energy to keep running — if it's not thundering, we aren't staying.",
+      "Other than that, we are like the average Green Mizorpians. We will not set you free until you help us find a new planet. What are you waiting for? Find us a planet NOW!"
+    ],
+
+    // LEVEL3_DIALOGUE
+    dialogue: [
+      "Storms. Thunder. Lightning. That is what keeps us alive — we feed on electricity.",
+      "We are otherwise like the Green Mizorpians, so the usual conditions apply too.",
+      "Find us a world that crackles, or you are staying here forever. Your choice."
+    ],
+
+    // LEVEL3_CHECKLIST
+    checklist: [
+      { bullet: "⚡", text: "Must have active storms and electrical activity" },
+      { bullet: "🌊", text: "Oceans still needed — like the Green Mizorpians" },
+      { bullet: "🌬️", text: "Breathable atmosphere required" },
+      { bullet: "🔒", text: "You are not free until this is done." }
+    ]
+  },
+
+  // ── Level 4 (index 3) — Kurou ─────────────────────────────────
+  {
+    alienImage: "/src/data/images/alien4.png",                   // ← LEVEL4_IMAGE
+    alienName:  "Kurou",                        // ← LEVEL4_NAME
+
+    // LEVEL4_INTRO
+    intro: [
+      "…",
+      "….",
+      "I like the taste of iron.",
+      "…",
+      "I LOVE THE TASTE OF IRON."
+    ],
+
+    // LEVEL4_DIALOGUE
+    dialogue: [
+      "…",
+      "I love the taste of iron."
+    ],
+
+    // LEVEL4_CHECKLIST
+    checklist: [
+      { bullet: "🔩", text: "Iron. Must have iron." },
+      { bullet: "🪨", text: "Rocky, mineral-rich surface preferred" },
+      { bullet: "…",  text: "That is all." }
+    ]
+  },
+
+  // ── Level 5 (index 4) — Nuurai Slug ───────────────────────────
+  {
+    alienImage: "/src/data/images/alien5.png",                   // ← LEVEL5_IMAGE
+    alienName:  "Nuurai Slug",                  // ← LEVEL5_NAME
+
+    // LEVEL5_INTRO
+    intro: [
+      "So you are the traveller who has been saving aliens in our universe. I expected you to be more… never mind, you will need to help us anyway.",
+      "I am a Nuurai slug — an ancient race of strong warriors, or 'snails' as you call them in your home world.",
+      "We have inhabited various planets throughout history. Each world has left its mark upon our shells — high-atmospheric worlds hardened us, ice worlds slowed our aging.",
+      "This made us one of the strongest aliens ever to exist. However, these adaptations made us very susceptible to heat and smoke, which our enemies have exploited.",
+      "So we need to adapt back to warmer, more unstable conditions. We found the Rubrik System, which seems ideal for us.",
+      "Please choose the optimal planet to make us stronger."
+    ],
+
+    // LEVEL5_DIALOGUE
+    dialogue: [
+      "We need warmth and instability — conditions that will toughen our shells once more.",
+      "Heat and some atmospheric turbulence are what we seek. We are done hiding from it.",
+      "Choose well, human. Our enemies — the Electric Mizorpians — will come for us either way."
+    ],
+
+    // LEVEL5_CHECKLIST
+    checklist: [
+      { bullet: "🔥", text: "Warmer temperatures — we need to re-adapt to heat" },
+      { bullet: "🌋", text: "Atmospheric instability will harden our shells" },
+      { bullet: "💨", text: "Some turbulence is a feature, not a flaw" },
+      { bullet: "🐌", text: "We are warriors. Find us a world worthy of us." }
+    ]
+  }
+
+];
+// END DIALOGUE_DATA
+
+/* ── Dialogue Engine (do not edit below unless you know what you're doing) ── */
+(function () {
+  const dlgBox       = document.getElementById('dialogueBox');
+  const dlgPortrait  = document.getElementById('dialoguePortrait');
+  const dlgPanel     = document.getElementById('dialoguePanel');
+  const dlgSpeaker   = document.getElementById('dialogueSpeaker');
+  const dlgText      = document.getElementById('dialogueText');
+  const dlgContinue  = document.getElementById('dialogueContinue');
+  const dlgSkip      = document.getElementById('dialogueSkip');
+  const alienHudBtn  = document.getElementById('alienHudBtn');
+  const checklist    = document.getElementById('alienChecklist');
+  const aclItems     = document.getElementById('aclItems');
+  const aclToggle    = document.getElementById('aclToggle');
+  const aclHeader    = document.getElementById('aclHeader');
+
+  let dlgQueue      = [];
+  let dlgIndex      = 0;
+  let dlgActive     = false;
+  let dlgLevelShown = new Set(); // levels whose intro has already played
+  let currentDlgLevel = -1;
+
+  // ── Render alien portrait ──
+  function setPortrait(data) {
+    const emojiEl = alienHudBtn.querySelector('.ahb-emoji');
+    if (data.alienImage) {
+      // Replace emoji with real image in HUD button
+      const img = document.createElement('img');
+      img.src = data.alienImage;
+      img.alt = data.alienName;
+      if (emojiEl) emojiEl.replaceWith(img);
+      // Dialogue portrait
+      dlgPortrait.src = data.alienImage;
+      dlgPortrait.classList.add('dlg-portrait--visible');
+    } else {
+      dlgPortrait.classList.remove('dlg-portrait--visible');
+    }
+  }
+
+  // ── Populate checklist ──
+  function buildChecklist(items) {
+    aclItems.innerHTML = '';
+    items.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'acl-item';
+      div.innerHTML = `<span class="acl-bullet">${item.bullet}</span><span>${item.text}</span>`;
+      aclItems.appendChild(div);
+    });
+  }
+
+  // ── Show dialogue queue ──
+  function startDialogue(lines) {
+    if (!lines || lines.length === 0) { endDialogue(); return; }
+    dlgQueue  = lines;
+    dlgIndex  = 0;
+    dlgActive = true;
+    dlgBox.classList.add('dlg--visible');
+    dlgSkip.classList.add('dlg--visible');
+    showLine();
+  }
+
+  function showLine() {
+    if (dlgIndex >= dlgQueue.length) { endDialogue(); return; }
+    const data = DIALOGUE_DATA[currentDlgLevel] || {};
+    dlgSpeaker.textContent = data.alienName || '';
+    dlgText.textContent    = dlgQueue[dlgIndex];
+    const isLast = dlgIndex === dlgQueue.length - 1;
+    dlgContinue.textContent = isLast ? '▼ click to close' : '▼ click to continue';
+  }
+
+  function advanceLine() {
+    if (!dlgActive) return;
+    dlgIndex++;
+    if (dlgIndex >= dlgQueue.length) { endDialogue(); return; }
+    showLine();
+  }
+
+  function endDialogue() {
+    dlgActive = false;
+    dlgBox.classList.remove('dlg--visible');
+    dlgSkip.classList.remove('dlg--visible');
+    // Show HUD icon + checklist
+    alienHudBtn.classList.add('ahb--visible');
+    checklist.classList.add('acl--visible');
+  }
+
+  function skipDialogue() {
+    if (!dlgActive) return;
+    endDialogue();
+  }
+
+  // ── Called by loadLevel to trigger dialogue for a level ──
+  function triggerLevelDialogue(levelIndex) {
+    currentDlgLevel = levelIndex;
+    const data = DIALOGUE_DATA[levelIndex];
+    if (!data) return;
+
+    setPortrait(data);
+    buildChecklist(data.checklist || []);
+
+    // Reset HUD/checklist visibility for new level
+    alienHudBtn.classList.remove('ahb--visible');
+    checklist.classList.remove('acl--visible');
+    checklist.classList.remove('acl--collapsed');
+
+    const alreadySeen = dlgLevelShown.has(levelIndex);
+    let lines;
+    if (!alreadySeen) {
+      dlgLevelShown.add(levelIndex);
+      lines = [...(data.intro || []), ...(data.dialogue || [])];
+    } else {
+      lines = [...(data.dialogue || [])];
+    }
+    // Small delay so the level transition finishes first
+    setTimeout(() => startDialogue(lines), 900);
+  }
+
+  // ── Replay via HUD icon (dialogue only, no intro) ──
+  alienHudBtn.addEventListener('click', () => {
+    const data = DIALOGUE_DATA[currentDlgLevel];
+    if (!data) return;
+    // Hide checklist while talking
+    checklist.classList.remove('acl--visible');
+    startDialogue([...(data.dialogue || [])]);
+  });
+
+  // ── Advance on panel click ──
+  dlgPanel.addEventListener('click', advanceLine);
+
+  // ── Skip button ──
+  dlgSkip.addEventListener('click', (e) => { e.stopPropagation(); skipDialogue(); });
+
+  // ── Checklist toggle ──
+  function toggleChecklist() {
+    checklist.classList.toggle('acl--collapsed');
+    aclToggle.setAttribute('aria-label',
+      checklist.classList.contains('acl--collapsed') ? 'Expand checklist' : 'Collapse checklist');
+  }
+  aclHeader.addEventListener('click', toggleChecklist);
+
+  // ── Hook into the existing loadLevel function ──
+  // We wrap it so our system fires automatically without touching the original.
+  const _origLoadLevel = typeof loadLevel === 'function' ? loadLevel : null;
+  if (_origLoadLevel) {
+    window.loadLevel = function (idx, immediate) {
+      _origLoadLevel(idx, immediate);
+      triggerLevelDialogue(idx);
+    };
+    // Trigger for the initial load (level 0) since init() calls loadLevel before our wrap
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => triggerLevelDialogue(0), 1200);
+    });
+  }
+
+  // Expose for manual calls if needed
+  window.DialogueSystem = { trigger: triggerLevelDialogue };
+})();
+/* END DIALOGUE_SYSTEM JS */
 </script>
 </body>
 </html>
