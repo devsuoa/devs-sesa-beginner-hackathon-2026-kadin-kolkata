@@ -574,10 +574,10 @@
 <script>
 const LEVELS = [
   {
-    level: 1, systemName: "Sol Secundus", starColor: 1,
+    level: 1, systemName: "Solara", starColor: 1,
     mission: "A yellow dwarf star system. Star profile: surface temperature ~5,500°C, lifespan ~10 billion years, and solar mass ~1.0 Msun. Find a world that can support liquid water and breathable air.",
     planets: [
-      { id: "p1", name: "Cinder", type: "Rocky • Inner", desc: "A scorched rock far too close to the star. Temperatures routinely exceed 450°C. No atmosphere to speak of.", stats: { "Surface Temp": "450°C", "Atmosphere": "None", "Water": "None", "Gravity": "0.38g", "Day Length": "58 Earth days" }, best: false, reasons: [{ label: "Temperature", val: 5, note: "Far too hot" }, { label: "Atmosphere", val: 0, note: "None detected" }, { label: "Water", val: 0, note: "Vaporised" }, { label: "Gravity", val: 40, note: "Too low" }, { label: "Radiation", val: 10, note: "Extreme" }] },
+      { id: "1-1", name: "Meteor Chunk A", type: "Meteor", desc: "A small rocky chunk tumbling through the system, scorched by Solara's rays.", stats: { "Surface Temp": "450°C", "Atmosphere": "None", "Water": "None", "Gravity": "0.38g", "Day Length": "58 Earth days" }, best: false, reasons: [{ label: "Temperature", val: 5, note: "Far too hot" }, { label: "Atmosphere", val: 0, note: "None detected" }, { label: "Water", val: 0, note: "Vaporised" }, { label: "Gravity", val: 40, note: "Too low" }, { label: "Radiation", val: 10, note: "Extreme" }] },
       { id: "p2", name: "Verdana", type: "Terrestrial • Habitable Zone", desc: "A lush blue-green world sitting comfortably in the habitable zone. Dense oxygen-nitrogen atmosphere, liquid oceans, and stable seasons.", stats: { "Surface Temp": "14°C avg", "Atmosphere": "N₂/O₂ mix", "Water": "71% surface", "Gravity": "1.05g", "Day Length": "26 Earth hours" }, best: true, reasons: [{ label: "Temperature", val: 95, note: "Near-ideal" }, { label: "Atmosphere", val: 98, note: "Breathable" }, { label: "Water", val: 92, note: "Abundant liquid" }, { label: "Gravity", val: 96, note: "Comfortable" }, { label: "Radiation", val: 88, note: "Protected" }] },
       { id: "p3", name: "Dustfall", type: "Desert • Outer Zone", desc: "A cold, arid world with a thin CO₂ atmosphere. Dust storms last months. Underground ice detected.", stats: { "Surface Temp": "-55°C avg", "Atmosphere": "Thin CO₂", "Water": "Subsurface ice", "Gravity": "0.72g", "Day Length": "24.6 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 30, note: "Too cold" }, { label: "Atmosphere", val: 18, note: "Not breathable" }, { label: "Water", val: 25, note: "Only ice" }, { label: "Gravity", val: 72, note: "Manageable" }, { label: "Radiation", val: 40, note: "High" }] },
       { id: "p4", name: "Gassian", type: "Gas Giant", desc: "A massive gas giant with swirling ammonia clouds. No solid surface. 200+ km/h winds.", stats: { "Surface Temp": "-120°C cloud tops", "Atmosphere": "H₂/He", "Water": "None accessible", "Gravity": "2.6g", "Day Length": "10 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 8, note: "Extreme cold/pressure" }, { label: "Atmosphere", val: 2, note: "No oxygen" }, { label: "Water", val: 5, note: "Inaccessible" }, { label: "Gravity", val: 10, note: "Crushing" }, { label: "Radiation", val: 20, note: "High belts" }] },
@@ -747,7 +747,7 @@ const wrongPlanetChoicesByLevel = [0, 0, 0, 0, 0];
 let isRedirectingToInvaders = false;
 const completedLevels = new Set();
 const WRONG_CHOICE_LIMIT = 3;
-const SPACE_INVADERS_BASE = '../spaceinvaders-master/spaceinvaders-master';
+const SPACE_INVADERS_BASE = './spaceinvaders-master/spaceinvaders-master';
 const SPACE_INVADERS_SCRIPTS = [
   `${SPACE_INVADERS_BASE}/js/starfield.js`,
   `${SPACE_INVADERS_BASE}/js/spaceinvaders.js`
