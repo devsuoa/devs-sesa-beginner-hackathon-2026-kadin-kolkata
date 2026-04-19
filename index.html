@@ -344,6 +344,87 @@ function drawPlanetCanvas(c2d,artKey,sz){
     });
     c2d.fillStyle='rgba(0,0,0,0.22)';c2d.beginPath();c2d.arc(cx2+r*.15,cy2+r*.15,r*.75,0,Math.PI*2);c2d.fill();
   }
+const LEVEL_PLANET_ART = [
+  [ {artKey:'volcanic',sz:20}, {artKey:'terrestrial_green',sz:26}, {artKey:'terrestrial_desert',sz:22}, {artKey:'gas_giant',sz:32}, {artKey:'ice',sz:22} ],
+  [ {artKey:'volcanic',sz:22}, {artKey:'terrestrial_green',sz:26}, {artKey:'terrestrial_cold',sz:22}, {artKey:'terrestrial_half',sz:20}, {artKey:'gas_yellow',sz:30} ],
+  [ {artKey:'meteor',sz:16}, {artKey:'terrestrial_green',sz:24}, {artKey:'terrestrial_desert',sz:20}, {artKey:'gas_yellow',sz:28}, {artKey:'ice',sz:20} ],
+  [ {artKey:'terrestrial_red',sz:22}, {artKey:'terrestrial_green',sz:26}, {artKey:'terrestrial_cold',sz:22}, {artKey:'terrestrial_desert',sz:20}, {artKey:'meteor',sz:16} ],
+  [ {artKey:'volcanic',sz:22}, {artKey:'terrestrial_red',sz:20}, {artKey:'terrestrial_green',sz:28}, {artKey:'terrestrial_desert',sz:20}, {artKey:'gas_yellow',sz:28} ],
+];
+
+let currentLevel = 0, isZoomedOut = false, selectedPlanetIdx = null, levelSolved = false, levelScores = [], gameComplete = false;
+/** Wrong planet picks per quiz level (index 0–4); max 3 per level before Space Invaders */
+const wrongPlanetChoicesByLevel = [0, 0, 0, 0, 0];
+let isRedirectingToInvaders = false;
+const completedLevels = new Set();
+const WRONG_CHOICE_LIMIT = 3;
+const SPACE_INVADERS_BASE = './spaceinvaders-master/spaceinvaders-master';
+const SPACE_INVADERS_SCRIPTS = [
+  `${SPACE_INVADERS_BASE}/js/starfield.js`,
+  `${SPACE_INVADERS_BASE}/js/spaceinvaders.js`
+];
+let spaceInvadersLoaded = false;
+let spaceInvadersStarted = false;
+let spaceInvadersGame = null;
+let spaceInvadersStarfield = null;
+let spaceInvadersInputListenersInstalled = false;
+/** Planet quiz level index (0–4) to restore after clearing Space Invaders wave 1 */
+let quizLevelResumeAfterInvaders = 0;
+
+const viewport = document.getElementById('viewport');
+const sun = document.getElementById('sun');
+const planetEls = [document.getElementById('p1'), document.getElementById('p2'), document.getElementById('p3'), document.getElementById('p4'), document.getElementById('p5')];
+const planetWraps = [document.getElementById('pw1'), document.getElementById('pw2'), document.getElementById('pw3'), document.getElementById('pw4'), document.getElementById('pw5')];
+const planetPanel = document.getElementById('planetPanel');
+const planetPanelTitle = document.getElementById('planetPanelTitle');
+const planetPanelMeta = document.getElementById('planetPanelMeta');
+const planetPanelDesc = document.getElementById('planetPanelDesc');
+const planetPanelStats = document.getElementById('planetPanelStats');
+const planetPanelClose = document.getElementById('planetPanelClose');
+const btnChoose = document.getElementById('btnChoose');
+const choiceResult = document.getElementById('choiceResult');
+const fadeOverlay = document.getElementById('fadeOverlay');
+const systemSplash = document.getElementById('systemSplash');
+const splashName = document.getElementById('splashName');
+const splashLevel = document.getElementById('splashLevel');
+const levelHud = document.getElementById('levelHud');
+const hudLabel = document.getElementById('hudLabel');
+const hudDots = document.getElementById('hudDots');
+const completionScreen = document.getElementById('completionScreen');
+const completionMedals = document.getElementById('completionMedals');
+const btnRestart = document.getElementById('btnRestart');
+const orbitSvg = document.getElementById('orbitSvg');
+const orbitRings = [1,2,3,4,5].map(i => document.getElementById('orbitRing' + i));
+const spaceInvadersScreen = document.getElementById('spaceInvadersScreen');
+const siStarfieldEl = document.getElementById('siStarfield');
+const siGameCanvas = document.getElementById('siGameCanvas');
+
+function ensureSpaceInvadersInputListeners() {
+  if (spaceInvadersInputListenersInstalled) return;
+  spaceInvadersInputListenersInstalled = true;
+  window.addEventListener('keydown', function onSpaceInvadersKeyDown(e) {
+    if (!spaceInvadersStarted || !spaceInvadersGame) return;
+    const keycode = e.which || window.event.keycode;
+    if (keycode === 37 || keycode === 39 || keycode === 32) e.preventDefault();
+    spaceInvadersGame.keyDown(keycode);
+  });
+  window.addEventListener('keyup', function onSpaceInvadersKeyUp(e) {
+    if (!spaceInvadersStarted || !spaceInvadersGame) return;
+    const keycode = e.which || window.event.keycode;
+    spaceInvadersGame.keyUp(keycode);
+  });
+  window.addEventListener('touchstart', function onSpaceInvadersTouchStart(e) {
+    if (!spaceInvadersStarted || !spaceInvadersGame) return;
+    spaceInvadersGame.touchstart(e);
+  }, false);
+  window.addEventListener('touchend', function onSpaceInvadersTouchEnd(e) {
+    if (!spaceInvadersStarted || !spaceInvadersGame) return;
+    spaceInvadersGame.touchend(e);
+  }, false);
+  window.addEventListener('touchmove', function onSpaceInvadersTouchMove(e) {
+    if (!spaceInvadersStarted || !spaceInvadersGame) return;
+    spaceInvadersGame.touchmove(e);
+  }, false);
 }
 
 let currentLevel=0,isZoomedOut=false,selectedPlanetIdx=null,levelSolved=false,levelScores=[];
