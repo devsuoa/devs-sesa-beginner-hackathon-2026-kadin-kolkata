@@ -672,20 +672,18 @@
 <div id="systemSplash">
   <div class="sys-label">Entering System</div>
   <div class="sys-name" id="splashName"></div>
-  <div class="sys-level" id="splashLevel"></div>
+  <div class="sys-mission" id="splashMission"></div>
   <div class="sys-hint">Click the star to explore</div>
 </div>
-
 <div id="levelHud">
   <div class="hud-level" id="hudLabel">Level 1 of 5</div>
   <div class="hud-dots" id="hudDots"></div>
 </div>
-
 <div class="viewport" id="viewport">
-  <aside class="planet-panel" id="planetPanel" aria-hidden="true" aria-labelledby="planetPanelTitle">
+  <aside class="planet-panel" id="planetPanel" aria-hidden="true">
     <div class="planet-panel__header">
       <h2 class="planet-panel__title" id="planetPanelTitle"></h2>
-      <button type="button" class="planet-panel__close" id="planetPanelClose" aria-label="Close planet details">×</button>
+      <button type="button" class="planet-panel__close" id="planetPanelClose" aria-label="Close">×</button>
     </div>
     <p class="planet-panel__meta" id="planetPanelMeta"></p>
     <p class="planet-panel__desc" id="planetPanelDesc"></p>
@@ -693,48 +691,22 @@
     <button class="btn-choose" id="btnChoose">Choose This Planet</button>
     <div id="choiceResult"></div>
   </aside>
-
-  <!-- Title above star -->
   <div class="landing-top" id="landingTop">
-    <div class="title">
-      <span class="re">RE-</span>
-      <span class="plan">PLAN</span>
-      <span class="it">-IT</span>
-    </div>
+    <div class="title"><span class="re">RE-</span><span class="plan">PLAN</span><span class="it">-IT</span></div>
   </div>
-
-  <!-- Info below star -->
   <div class="landing-bottom" id="landingBottom">
     <div class="landing-card">
-      <p class="subtitle" id="landingSubtitle">G-type star -> G‑type stars have surface temperatures of 4,927°C to 5,727°C, with sizes close to the Sun at about 0.9–1.1 solar masses, and luminosities ranging from 0.6 to 1.5 times that of the Sun.</p>
-      <p class="tap-hint"><strong>Tip:</strong> Click the star again to return to this view.</p>
+      <p class="subtitle" id="landingSubtitle"></p>
+      <p class="tap-hint"><strong>Tip:</strong> Click the star to explore the system.</p>
     </div>
   </div>
-
   <div class="system-wrap" id="systemWrap">
     <div class="system" id="systemEl" aria-hidden="true">
-      <button type="button" class="sun" id="sun" data-level="1" aria-label="Zoom: show full star system"></button>
-
-      <!-- Static SVG orbit rings — circles drawn at exact orbital radii.
-           Radii in px match the JS orbit config below (max values). -->
-      <svg id="orbitSvg" width="0" height="0" aria-hidden="true">
-        <circle id="orbitRing1" cx="0" cy="0" fill="none" stroke="rgba(203,213,225,0.4)" stroke-width="1" stroke-dasharray="4 6"/>
-        <circle id="orbitRing2" cx="0" cy="0" fill="none" stroke="rgba(203,213,225,0.4)" stroke-width="1" stroke-dasharray="4 6"/>
-        <circle id="orbitRing3" cx="0" cy="0" fill="none" stroke="rgba(203,213,225,0.4)" stroke-width="1" stroke-dasharray="4 6"/>
-        <circle id="orbitRing4" cx="0" cy="0" fill="none" stroke="rgba(203,213,225,0.4)" stroke-width="1" stroke-dasharray="4 6"/>
-        <circle id="orbitRing5" cx="0" cy="0" fill="none" stroke="rgba(186,198,216,0.28)" stroke-width="1" stroke-dasharray="4 6"/>
-      </svg>
-
-      <!-- Planet wrappers — JS positions these each frame via left/top -->
-      <div class="planet-wrap" id="pw1"><div class="planet" id="p1"></div></div>
-      <div class="planet-wrap" id="pw2"><div class="planet" id="p2"></div></div>
-      <div class="planet-wrap" id="pw3"><div class="planet" id="p3"></div></div>
-      <div class="planet-wrap" id="pw4"><div class="planet" id="p4"></div></div>
-      <div class="planet-wrap" id="pw5"><div class="planet" id="p5"></div></div>
+      <button type="button" class="sun" id="sun" aria-label="Zoom into star system"></button>
+      <svg id="orbitSvg" width="0" height="0" aria-hidden="true"></svg>
     </div>
   </div>
-
-  <p class="zoom-hint" id="zoomHint">Solar system view —> click the star to zoom back in</p>
+  <p class="zoom-hint">Solar system view — click the star to zoom back in</p>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -776,663 +748,535 @@
 
 <div id="completionScreen">
   <div class="completion-stars" id="completionStars"></div>
-  <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center;">
+  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center">
     <div class="completion-badge">🌍</div>
     <div class="completion-eyebrow">Mission Accomplished</div>
     <div class="completion-title">New Homes Found</div>
-    <p class="completion-sub">You've successfully aided multiple species across 5 star systems and found habitable planets for each civilisation. Life continues.</p>
+    <p class="completion-sub">You've successfully guided alien species across 5 star systems and found habitable planets for each civilisation.</p>
     <div class="completion-medals" id="completionMedals"></div>
     <button class="btn-restart" id="btnRestart">Play Again</button>
   </div>
 </div>
 
-<div id="spaceInvadersScreen" aria-hidden="true">
-  <div id="siStarfield"></div>
-  <div id="siGameContainer">
-    <canvas id="siGameCanvas"></canvas>
-  </div>
-  <div id="siInfo">Clear wave 1 to return to your planet mission. Use ← → and Space to play.</div>
-</div>
-
 <script>
 const LEVELS = [
   {
-    level: 1, systemName: "Sol Secundus", starColor: 1,
-    mission: "A yellow dwarf star system. Star profile: surface temperature ~5,500°C, lifespan ~10 billion years, and solar mass ~1.0 Msun. Find a world that can support liquid water and breathable air.",
-    planets: [
-      { id: "p1", name: "Cinder", type: "Rocky • Inner", desc: "A scorched rock far too close to the star. Temperatures routinely exceed 450°C. No atmosphere to speak of.", stats: { "Surface Temp": "450°C", "Atmosphere": "None", "Water": "None", "Gravity": "0.38g", "Day Length": "58 Earth days" }, best: false, reasons: [{ label: "Temperature", val: 5, note: "Far too hot" }, { label: "Atmosphere", val: 0, note: "None detected" }, { label: "Water", val: 0, note: "Vaporised" }, { label: "Gravity", val: 40, note: "Too low" }, { label: "Radiation", val: 10, note: "Extreme" }] },
-      { id: "p2", name: "Verdana", type: "Terrestrial • Habitable Zone", desc: "A lush blue-green world sitting comfortably in the habitable zone. Dense oxygen-nitrogen atmosphere, liquid oceans, and stable seasons.", stats: { "Surface Temp": "14°C avg", "Atmosphere": "N₂/O₂ mix", "Water": "71% surface", "Gravity": "1.05g", "Day Length": "26 Earth hours" }, best: true, reasons: [{ label: "Temperature", val: 95, note: "Near-ideal" }, { label: "Atmosphere", val: 98, note: "Breathable" }, { label: "Water", val: 92, note: "Abundant liquid" }, { label: "Gravity", val: 96, note: "Comfortable" }, { label: "Radiation", val: 88, note: "Protected" }] },
-      { id: "p3", name: "Dustfall", type: "Desert • Outer Zone", desc: "A cold, arid world with a thin CO₂ atmosphere. Dust storms last months. Underground ice detected.", stats: { "Surface Temp": "-55°C avg", "Atmosphere": "Thin CO₂", "Water": "Subsurface ice", "Gravity": "0.72g", "Day Length": "24.6 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 30, note: "Too cold" }, { label: "Atmosphere", val: 18, note: "Not breathable" }, { label: "Water", val: 25, note: "Only ice" }, { label: "Gravity", val: 72, note: "Manageable" }, { label: "Radiation", val: 40, note: "High" }] },
-      { id: "p4", name: "Gassian", type: "Gas Giant", desc: "A massive gas giant with swirling ammonia clouds. No solid surface. 200+ km/h winds.", stats: { "Surface Temp": "-120°C cloud tops", "Atmosphere": "H₂/He", "Water": "None accessible", "Gravity": "2.6g", "Day Length": "10 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 8, note: "Extreme cold/pressure" }, { label: "Atmosphere", val: 2, note: "No oxygen" }, { label: "Water", val: 5, note: "Inaccessible" }, { label: "Gravity", val: 10, note: "Crushing" }, { label: "Radiation", val: 20, note: "High belts" }] },
-      { id: "p5", name: "Rimstone", type: "Ice Giant • Far Orbit", desc: "A frigid ice world on the outer rim. Methane ice caps cover everything. Barely any solar energy reaches here.", stats: { "Surface Temp": "-200°C", "Atmosphere": "CH₄/N₂", "Water": "Frozen solid", "Gravity": "1.1g", "Day Length": "17 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 2, note: "Near absolute zero" }, { label: "Atmosphere", val: 10, note: "Toxic methane" }, { label: "Water", val: 15, note: "All frozen" }, { label: "Gravity", val: 80, note: "Adequate" }, { label: "Radiation", val: 65, note: "Low" }] }
+    id:1, name:"System Solara",
+    star:{color:"yellow", description:"A stable, warm star similar to our own sun. Conditions are relatively forgiving."},
+    planets:[
+      {id:"1-1",name:"Meteor Chunk A",type:"Meteor",temperature:290,waterCoverage:null,atmosphere:null,atmosphereThickness:null,mass:null,weather:null,ozoneLayer:false,description:"A small rocky chunk tumbling through the system, scorched by Solara's rays.",bestAnswer:false,artKey:"meteor"},
+      {id:"1-2",name:"Ashora",type:"Terrestrial",temperature:42,waterCoverage:25,atmosphere:"Nitrogen-Oxygen",atmosphereThickness:"Thin",mass:0.8,weather:"Moderate",ozoneLayer:false,description:"A dry, dusty world with small scattered lakes and harsh sunlight.",bestAnswer:false,artKey:"terrestrial_desert"},
+      {id:"1-3",name:"Verdania",type:"Terrestrial",temperature:18,waterCoverage:65,atmosphere:"Nitrogen-Oxygen",atmosphereThickness:"Thick",mass:1.1,weather:"Mild",ozoneLayer:true,description:"A lush, green world with vast forests and calm seas.",bestAnswer:true,artKey:"terrestrial_green"},
+      {id:"1-4",name:"Glacius",type:"Ice Planet",temperature:-85,waterCoverage:90,atmosphere:"Nitrogen",atmosphereThickness:"Thin",mass:0.9,weather:"Extreme",ozoneLayer:false,description:"A frozen world entirely encased in thick ice sheets.",bestAnswer:false,artKey:"ice"},
+      {id:"1-5",name:"Meteor Chunk B",type:"Meteor",temperature:260,waterCoverage:null,atmosphere:null,atmosphereThickness:null,mass:null,weather:null,ozoneLayer:false,description:"A city-sized rock with no atmosphere or water, drifting aimlessly.",bestAnswer:false,artKey:"meteor2"}
     ]
   },
   {
-    level: 2, systemName: "Pyraxis Drift", starColor: 2,
-    mission: "K-class stars: A K-class star has a surface temperature of about 3,700–5,200 °C, a mass around 0.5–0.8 times the Sun, a luminosity of roughly 0.08–0.6 times solar, and a lifespan of about 15–30 billion years.",
-    planets: [
-      { id: "p1", name: "Scoria", type: "Volcanic • Inner", desc: "Relentless volcanic activity resurfaces this world every century. Sulfuric acid rain. No stable land.", stats: { "Surface Temp": "380°C", "Atmosphere": "SO₂/CO₂", "Water": "None", "Gravity": "0.92g", "Day Length": "243 Earth days" }, best: false, reasons: [{ label: "Temperature", val: 5, note: "Volcanic hellscape" }, { label: "Atmosphere", val: 2, note: "Toxic acid clouds" }, { label: "Water", val: 0, note: "Evaporated" }, { label: "Gravity", val: 82, note: "Near Earth" }, { label: "Radiation", val: 12, note: "High" }] },
-      { id: "p2", name: "Havenport", type: "Terrestrial • Habitable Zone", desc: "Warm coastal plains, a thick protective magnetosphere, and vast shallow seas make this world a near-perfect refuge.", stats: { "Surface Temp": "22°C avg", "Atmosphere": "N₂/O₂/Ar", "Water": "62% surface", "Gravity": "0.98g", "Day Length": "29 Earth hours" }, best: true, reasons: [{ label: "Temperature", val: 92, note: "Warm, stable" }, { label: "Atmosphere", val: 96, note: "Fully breathable" }, { label: "Water", val: 88, note: "Shallow seas" }, { label: "Gravity", val: 97, note: "Nearly identical" }, { label: "Radiation", val: 91, note: "Strong magnetosphere" }] },
-      { id: "p3", name: "Thalwick", type: "Ocean World", desc: "Entirely covered in a global ocean 80km deep. No land masses. Crushing pressure at depth.", stats: { "Surface Temp": "8°C surface", "Atmosphere": "Humid N₂/O₂", "Water": "100% surface", "Gravity": "1.2g", "Day Length": "31 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 65, note: "Cold but livable" }, { label: "Atmosphere", val: 70, note: "Breathable but humid" }, { label: "Water", val: 50, note: "Too much! No land" }, { label: "Gravity", val: 60, note: "Slightly heavy" }, { label: "Radiation", val: 75, note: "Moderate" }] },
-      { id: "p4", name: "Greyfel", type: "Rocky • Tidally Locked", desc: "One face permanently bakes, the other is permanently frozen. A thin habitable strip exists at the terminator.", stats: { "Surface Temp": "-90°C to 300°C", "Atmosphere": "Thin N₂", "Water": "Terminator rivers", "Gravity": "0.88g", "Day Length": "Tidally locked" }, best: false, reasons: [{ label: "Temperature", val: 35, note: "Extreme range" }, { label: "Atmosphere", val: 30, note: "Too thin" }, { label: "Water", val: 28, note: "Narrow rivers only" }, { label: "Gravity", val: 85, note: "Comfortable" }, { label: "Radiation", val: 22, note: "Exposed side lethal" }] },
-      { id: "p5", name: "Duskward", type: "Super-Earth • Far Zone", desc: "A massive world with intense gravity. Thick hydrogen atmosphere traps greenhouse heat, but the pressure is deadly.", stats: { "Surface Temp": "55°C avg", "Atmosphere": "Dense H₂/He", "Water": "Subsurface lakes", "Gravity": "2.4g", "Day Length": "19 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 40, note: "Too warm" }, { label: "Atmosphere", val: 15, note: "Unbreathable" }, { label: "Water", val: 35, note: "Underground only" }, { label: "Gravity", val: 20, note: "Crushing for humans" }, { label: "Radiation", val: 55, note: "Moderate" }] }
+    id:2, name:"System Auron",
+    star:{color:"orange", description:"A slightly cooler star than our sun. Habitable zones are closer in, and conditions are trickier to read."},
+    planets:[
+      {id:"2-1",name:"Ferrox",type:"Terrestrial",temperature:55,waterCoverage:20,atmosphere:"CO2",atmosphereThickness:"Thick",mass:1.8,weather:"Extreme",ozoneLayer:false,description:"A hot, heavy world with a suffocating CO2 atmosphere and violent dust storms.",bestAnswer:false,artKey:"terrestrial_red"},
+      {id:"2-2",name:"Sulphara",type:"Gas Dwarf",temperature:60,waterCoverage:null,atmosphere:"Sulfur Dioxide",atmosphereThickness:"Very Thick",mass:4.5,weather:"Moderate",ozoneLayer:false,description:"A small gas planet with toxic yellow clouds and high pressure.",bestAnswer:true,artKey:"gas_yellow"},
+      {id:"2-3",name:"Duskara",type:"Terrestrial",temperature:38,waterCoverage:30,atmosphere:"Nitrogen",atmosphereThickness:"Moderate",mass:1.0,weather:"Moderate",ozoneLayer:false,description:"Decent gravity and size, but lacks oxygen and has very little water.",bestAnswer:false,artKey:"terrestrial_desert"},
+      {id:"2-4",name:"Tempera",type:"Terrestrial",temperature:28,waterCoverage:55,atmosphere:"Nitrogen-Oxygen",atmosphereThickness:"Thick",mass:1.3,weather:"Moderate",ozoneLayer:true,description:"A warm humid world with frequent rainstorms but stable enough conditions for life.",bestAnswer:false,artKey:"terrestrial_green"},
+      {id:"2-5",name:"Mirava",type:"Terrestrial",temperature:-15,waterCoverage:45,atmosphere:"Nitrogen-Oxygen",atmosphereThickness:"Thin",mass:0.6,weather:"Moderate",ozoneLayer:false,description:"A cold but somewhat promising world — thin air makes it a tough call.",bestAnswer:false,artKey:"terrestrial_cold"},
+      {id:"2-6",name:"Meteor Chunk C",type:"Meteor",temperature:180,waterCoverage:null,atmosphere:null,atmosphereThickness:null,mass:null,weather:null,ozoneLayer:false,description:"A moon-sized rock with deep craters and no signs of anything useful.",bestAnswer:false,artKey:"meteor"}
     ]
   },
   {
-    level: 3, systemName: "Rubicant's Eye", starColor: 3,
-    mission: "M-class stars: An M-class star has a surface temperature of about 2,200–3,700 °C, a mass around 0.08–0.5 times the Sun, a luminosity of roughly 0.0001–0.08 times solar, and a lifespan ranging from 50 billion to over a trillion years.",
-    planets: [
-      { id: "p1", name: "Ashveil", type: "Rocky • Flare-Blasted", desc: "Stripped of its atmosphere by repeated stellar flares. Bare rock under constant X-ray bombardment.", stats: { "Surface Temp": "120°C day / -180°C night", "Atmosphere": "None", "Water": "None", "Gravity": "0.61g", "Day Length": "Tidally locked" }, best: false, reasons: [{ label: "Temperature", val: 8, note: "Extreme swing" }, { label: "Atmosphere", val: 0, note: "Stripped away" }, { label: "Water", val: 0, note: "None" }, { label: "Gravity", val: 55, note: "Low" }, { label: "Radiation", val: 1, note: "Lethal flares" }] },
-      { id: "p2", name: "Miravel", type: "Terrestrial • Deep Magnetosphere", desc: "A compact world with an unusually powerful magnetic field shielding it from flares. Deep red-lit forests, breathable air, and warm springs.", stats: { "Surface Temp": "18°C avg", "Atmosphere": "N₂/O₂", "Water": "48% surface", "Gravity": "0.9g", "Day Length": "62 Earth hours" }, best: true, reasons: [{ label: "Temperature", val: 88, note: "Warm and stable" }, { label: "Atmosphere", val: 90, note: "Breathable" }, { label: "Water", val: 82, note: "Good coverage" }, { label: "Gravity", val: 88, note: "Comfortable" }, { label: "Radiation", val: 85, note: "Strong mag. shield" }] },
-      { id: "p3", name: "Thornwall", type: "Rocky • Outer", desc: "A barren, cold world with a thin argon atmosphere. Occasional methane geysers. Possibly habitable underground.", stats: { "Surface Temp": "-70°C avg", "Atmosphere": "Thin Ar/N₂", "Water": "Subsurface", "Gravity": "0.78g", "Day Length": "30 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 22, note: "Too cold" }, { label: "Atmosphere", val: 20, note: "Not breathable" }, { label: "Water", val: 20, note: "Underground only" }, { label: "Gravity", val: 75, note: "Manageable" }, { label: "Radiation", val: 50, note: "Moderate" }] },
-      { id: "p4", name: "Crestfall", type: "Mini-Neptune • Inner", desc: "A bloated mini-Neptune close to the red dwarf, with hydrogen clouds and no solid surface.", stats: { "Surface Temp": "200°C", "Atmosphere": "H₂/CH₄", "Water": "Atmospheric only", "Gravity": "3.1g", "Day Length": "8 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 10, note: "Too hot" }, { label: "Atmosphere", val: 5, note: "Toxic gas" }, { label: "Water", val: 10, note: "Steam only" }, { label: "Gravity", val: 5, note: "Crushing" }, { label: "Radiation", val: 5, note: "Near star" }] },
-      { id: "p5", name: "Pallowdusk", type: "Icy Moon • Gas Giant", desc: "A moon orbiting a distant gas giant. Subsurface ocean under 30km of ice. No atmosphere, no warmth.", stats: { "Surface Temp": "-180°C", "Atmosphere": "None", "Water": "Under ice", "Gravity": "0.3g", "Day Length": "4 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 3, note: "Frozen solid" }, { label: "Atmosphere", val: 0, note: "Vacuum" }, { label: "Water", val: 30, note: "Buried under ice" }, { label: "Gravity", val: 20, note: "Very low" }, { label: "Radiation", val: 15, note: "Radiation belt" }] }
+    id:3, name:"System Caelrix",
+    star:{color:"blue", description:"A massive, intensely hot star pumping out radiation. No perfect worlds here — survival is the best you can hope for."},
+    planets:[
+      {id:"3-1",name:"Pyreth",type:"Volcanic",temperature:310,waterCoverage:0,atmosphere:"Sulfur Dioxide",atmosphereThickness:"Very Thick",mass:2.1,weather:"Extreme",ozoneLayer:false,description:"A volcanic hellscape with rivers of lava and acid rain.",bestAnswer:false,artKey:"volcanic"},
+      {id:"3-2",name:"Meteor Chunk D",type:"Meteor",temperature:420,waterCoverage:null,atmosphere:null,atmosphereThickness:null,mass:null,weather:null,ozoneLayer:false,description:"A small rock being slowly vaporized by Caelrix's intense radiation.",bestAnswer:false,artKey:"meteor"},
+      {id:"3-3",name:"Vantara",type:"Terrestrial",temperature:65,waterCoverage:15,atmosphere:"CO2",atmosphereThickness:"Thick",mass:1.5,weather:"Extreme",ozoneLayer:false,description:"Scorched and heavy with a thick CO2 blanket trapping heat.",bestAnswer:false,artKey:"terrestrial_red"},
+      {id:"3-4",name:"Scoria",type:"Terrestrial",temperature:58,waterCoverage:22,atmosphere:"Nitrogen-Oxygen",atmosphereThickness:"Thick",mass:1.2,weather:"Extreme",ozoneLayer:true,description:"Hot and dry with a breathable but thick atmosphere. Survivable, barely.",bestAnswer:true,artKey:"terrestrial_desert"},
+      {id:"3-5",name:"Meteor Chunk E",type:"Meteor",temperature:390,waterCoverage:null,atmosphere:null,atmosphereThickness:null,mass:null,weather:null,ozoneLayer:false,description:"A city-sized chunk of scorched rock with deep radiation burns.",bestAnswer:false,artKey:"meteor2"},
+      {id:"3-6",name:"Halcyon",type:"Terrestrial",temperature:-18,waterCoverage:40,atmosphere:"Nitrogen-Oxygen",atmosphereThickness:"Moderate",mass:0.7,weather:"Moderate",ozoneLayer:true,description:"Cold but shielded. Low gravity makes it tough, but it's the most promising option here.",bestAnswer:true,artKey:"terrestrial_cold"},
+      {id:"3-7",name:"Rhovex",type:"Gas Giant",temperature:-140,waterCoverage:null,atmosphere:"Hydrogen-Helium",atmosphereThickness:"Extreme",mass:18.0,weather:"Extreme",ozoneLayer:false,description:"A massive gas giant with no solid surface and crushing gravity.",bestAnswer:false,artKey:"gas_giant"}
     ]
   },
   {
-    level: 4, systemName: "Veilwatch", starColor: 4,
-    mission: "B-class stars: A B-class star has a surface temperature of about 10,000–30,000 °C, a mass around 2–16 times the Sun, a luminosity of roughly 25–30,000 times solar, and a lifespan of about 10–100 million years.",
-    planets: [
-      { id: "p1", name: "Solarfract", type: "Chaotic • Inner Crossing", desc: "Its orbit crosses both stars, creating seasons of searing heat followed by deep freeze.", stats: { "Surface Temp": "-120°C to 600°C", "Atmosphere": "Ionised plasma", "Water": "None", "Gravity": "1.1g", "Day Length": "Variable" }, best: false, reasons: [{ label: "Temperature", val: 2, note: "Wildly unstable" }, { label: "Atmosphere", val: 0, note: "Ionised, lethal" }, { label: "Water", val: 0, note: "None" }, { label: "Gravity", val: 75, note: "Fine" }, { label: "Radiation", val: 0, note: "Extreme dual-star" }] },
-      { id: "p2", name: "Calixara", type: "Terrestrial • Stable Lagrange", desc: "Nestled at the stable Lagrange point of the binary pair, this world receives gentle balanced radiation, has a rich nitrogen-oxygen atmosphere, and rolling highland continents.", stats: { "Surface Temp": "11°C avg", "Atmosphere": "N₂/O₂/CO₂", "Water": "55% surface", "Gravity": "1.02g", "Day Length": "33 Earth hours" }, best: true, reasons: [{ label: "Temperature", val: 91, note: "Stable & temperate" }, { label: "Atmosphere", val: 94, note: "Breathable" }, { label: "Water", val: 87, note: "Seas + rivers" }, { label: "Gravity", val: 98, note: "Near-Earth" }, { label: "Radiation", val: 80, note: "Lagrange shielded" }] },
-      { id: "p3", name: "Wavecrest", type: "Super-Ocean • Mid-Orbit", desc: "Tidal forces from the twin stars churn endless megastorms across a global ocean. No landmasses.", stats: { "Surface Temp": "28°C avg", "Atmosphere": "Water vapour/N₂", "Water": "100% surface", "Gravity": "1.15g", "Day Length": "40 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 60, note: "Warm but wet" }, { label: "Atmosphere", val: 55, note: "Humid only" }, { label: "Water", val: 40, note: "Too much — no land" }, { label: "Gravity", val: 65, note: "Slightly heavy" }, { label: "Radiation", val: 60, note: "Moderate" }] },
-      { id: "p4", name: "Dustlance", type: "Desert • Far Orbit", desc: "A cold, dusty world far from both stars. Receives very little light. Underground geothermal vents keep the core warm.", stats: { "Surface Temp": "-80°C avg", "Atmosphere": "CO₂/N₂", "Water": "Underground geothermal", "Gravity": "0.85g", "Day Length": "72 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 18, note: "Too cold" }, { label: "Atmosphere", val: 22, note: "Not breathable" }, { label: "Water", val: 22, note: "Deep underground" }, { label: "Gravity", val: 82, note: "Manageable" }, { label: "Radiation", val: 70, note: "Low, far orbit" }] },
-      { id: "p5", name: "Helixar", type: "Rogue Rocky • Captured", desc: "A captured rogue planet with no original stellar orbit. Black skies, geothermal heat only. Strange mineral forests.", stats: { "Surface Temp": "-140°C avg", "Atmosphere": "Trace N₂", "Water": "None surface", "Gravity": "0.95g", "Day Length": "N/A — no star" }, best: false, reasons: [{ label: "Temperature", val: 10, note: "Freezing cold" }, { label: "Atmosphere", val: 8, note: "Almost none" }, { label: "Water", val: 5, note: "Deep rock only" }, { label: "Gravity", val: 88, note: "Good" }, { label: "Radiation", val: 80, note: "No star = low" }] }
+    id:4, name:"System Rubrik",
+    star:{color:"red", description:"A dim, cool star. Planets must orbit very close to get any warmth, leading to tidal locking and unpredictable conditions."},
+    planets:[
+      {id:"4-1",name:"Tidalis",type:"Terrestrial",temperature:12,waterCoverage:50,atmosphere:"Nitrogen-Oxygen",atmosphereThickness:"Moderate",mass:0.9,weather:"Extreme",ozoneLayer:false,description:"Tidally locked — one side is scorching, the other frozen. The thin habitable band in between is survivable but unstable.",bestAnswer:false,artKey:"terrestrial_half"},
+      {id:"4-2",name:"Umbros",type:"Terrestrial",temperature:-60,waterCoverage:10,atmosphere:"Nitrogen",atmosphereThickness:"Thin",mass:0.5,weather:"Extreme",ozoneLayer:false,description:"The dark side of a tidally locked planet — perpetually frozen and lightless.",bestAnswer:false,artKey:"terrestrial_cold"},
+      {id:"4-3",name:"Veldris",type:"Volcanic",temperature:200,waterCoverage:0,atmosphere:"Sulfur Dioxide",atmosphereThickness:"Very Thick",mass:2.8,weather:"Extreme",ozoneLayer:false,description:"Heated from within by volcanic activity. Toxic and crushing.",bestAnswer:false,artKey:"volcanic"},
+      {id:"4-4",name:"Margon",type:"Terrestrial",temperature:22,waterCoverage:35,atmosphere:"CO2",atmosphereThickness:"Moderate",mass:1.0,weather:"Moderate",ozoneLayer:false,description:"Reasonable temperature and gravity, but the CO2 atmosphere makes it unbreathable without equipment.",bestAnswer:false,artKey:"terrestrial_desert"},
+      {id:"4-5",name:"Flara",type:"Terrestrial",temperature:120,waterCoverage:15,atmosphere:"Nitrogen-Oxygen",atmosphereThickness:"Thin",mass:1.1,weather:null,ozoneLayer:false,description:"Constantly bombarded by solar flares from Rubrik. High concentration of rich minerals.",bestAnswer:true,artKey:"terrestrial_red"},
+      {id:"4-6",name:"Cryovast",type:"Ice Planet",temperature:-110,waterCoverage:85,atmosphere:"Nitrogen",atmosphereThickness:"Thin",mass:1.4,weather:"Extreme",ozoneLayer:false,description:"An ocean world completely frozen over. Surface uninhabitable.",bestAnswer:false,artKey:"ice"},
+      {id:"4-7",name:"Meteor Chunk F",type:"Meteor",temperature:-200,waterCoverage:null,atmosphere:null,atmosphereThickness:null,mass:null,weather:null,ozoneLayer:false,description:"A large frozen rock drifting at the edge of the system.",bestAnswer:false,artKey:"meteor"},
+      {id:"4-8",name:"Meteor Chunk G",type:"Meteor",temperature:-180,waterCoverage:null,atmosphere:null,atmosphereThickness:null,mass:null,weather:null,ozoneLayer:false,description:"A tiny frozen pebble lost in the outer reaches.",bestAnswer:false,artKey:"meteor2"}
     ]
   },
   {
-    level: 5, systemName: "Aethon's Crown", starColor: 5,
-    mission: "An extremely rare green-white star, ancient and stable. This is the final frontier. Find humanity's new permanent home.",
-    planets: [
-      { id: "p1", name: "Embervast", type: "Volcanic • Tidally Stressed", desc: "Tidally heated by two massive moons. Perpetual eruptions and lava rivers. Beautiful but lethal.", stats: { "Surface Temp": "340°C", "Atmosphere": "SO₂/CO₂", "Water": "Lava only", "Gravity": "1.3g", "Day Length": "18 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 4, note: "Molten surface" }, { label: "Atmosphere", val: 3, note: "Toxic gases" }, { label: "Water", val: 0, note: "None" }, { label: "Gravity", val: 55, note: "Too heavy" }, { label: "Radiation", val: 20, note: "High" }] },
-      { id: "p2", name: "Obrigan", type: "Rocky • Eccentric Orbit", desc: "Highly elliptical orbit causes extreme seasonal swings — scorching summers, glacial winters every 8 years.", stats: { "Surface Temp": "-80°C to 200°C (cycle)", "Atmosphere": "N₂/CO₂", "Water": "Periodic seas", "Gravity": "0.95g", "Day Length": "22 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 25, note: "Extreme cycles" }, { label: "Atmosphere", val: 35, note: "Partial only" }, { label: "Water", val: 30, note: "Seasonal" }, { label: "Gravity", val: 88, note: "Good" }, { label: "Radiation", val: 45, note: "Variable" }] },
-      { id: "p3", name: "Aetherholm", type: "Terrestrial • Prime Habitable", desc: "A golden world of vast forests, turquoise seas, and continent-spanning mountain ranges. Ancient and geologically stable. The perfect home.", stats: { "Surface Temp": "16°C avg", "Atmosphere": "N₂/O₂/Ar", "Water": "68% surface", "Gravity": "1.01g", "Day Length": "25 Earth hours" }, best: true, reasons: [{ label: "Temperature", val: 97, note: "Near-perfect" }, { label: "Atmosphere", val: 99, note: "Ideal mix" }, { label: "Water", val: 95, note: "Abundant" }, { label: "Gravity", val: 99, note: "Virtually identical" }, { label: "Radiation", val: 93, note: "Well shielded" }] },
-      { id: "p4", name: "Glassmere", type: "Crystal Desert • Mid", desc: "A silicon-rich world encrusted with crystalline formations that scatter starlight beautifully but dangerously. Razor-sharp at every turn.", stats: { "Surface Temp": "42°C avg", "Atmosphere": "Silicate dust/N₂", "Water": "Underground aquifers", "Gravity": "1.18g", "Day Length": "27 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 45, note: "Too warm" }, { label: "Atmosphere", val: 18, note: "Caustic dust" }, { label: "Water", val: 25, note: "Deep underground" }, { label: "Gravity", val: 60, note: "Heavy" }, { label: "Radiation", val: 52, note: "Crystal scatter" }] },
-      { id: "p5", name: "Nebulon", type: "Gas Dwarf • Outer", desc: "A small gas world with swirling pastel clouds. No solid surface. Enormous magnetic field though.", stats: { "Surface Temp": "-60°C cloud tops", "Atmosphere": "H₂/He/CH₄", "Water": "None accessible", "Gravity": "1.9g", "Day Length": "14 Earth hours" }, best: false, reasons: [{ label: "Temperature", val: 12, note: "Far too cold" }, { label: "Atmosphere", val: 5, note: "No oxygen" }, { label: "Water", val: 8, note: "Inaccessible" }, { label: "Gravity", val: 25, note: "Too strong" }, { label: "Radiation", val: 68, note: "Shielded by field" }] }
+    id:5, name:"System Diaxis",
+    star:{color:"binary", description:"Two stars orbiting each other — Diaxis-A (hot blue) and Diaxis-B (cool red). Gravitational chaos makes conditions wildly unpredictable."},
+    planets:[
+      {id:"5-1",name:"Nullis",type:"Barren",temperature:95,waterCoverage:0,atmosphere:null,atmosphereThickness:null,mass:0.8,weather:null,ozoneLayer:false,description:"A completely barren rock, stripped clean by radiation of two stars.",bestAnswer:false,artKey:"meteor"},
+      {id:"5-2",name:"Duskrife",type:"Terrestrial",temperature:70,waterCoverage:10,atmosphere:"CO2",atmosphereThickness:"Very Thick",mass:2.2,weather:"Extreme",ozoneLayer:false,description:"A heavy, hot world baking under two suns with a runaway greenhouse effect.",bestAnswer:false,artKey:"terrestrial_red"},
+      {id:"5-3",name:"Paradox",type:"Terrestrial",temperature:45,waterCoverage:40,atmosphere:"Nitrogen-Oxygen",atmosphereThickness:"Very Thick",mass:1.6,weather:"Moderate",ozoneLayer:false,description:"The most Earth-like in the system, but gravitational stress from both stars causes constant earthquakes and atmospheric instability.",bestAnswer:true,artKey:"terrestrial_green"},
+      {id:"5-4",name:"Meteor Chunk H",type:"Meteor",temperature:150,waterCoverage:null,atmosphere:null,atmosphereThickness:null,mass:null,weather:null,ozoneLayer:false,description:"A medium rock caught in a chaotic figure-eight orbit between both stars.",bestAnswer:false,artKey:"meteor"},
+      {id:"5-5",name:"Ecliptor",type:"Terrestrial",temperature:-5,waterCoverage:55,atmosphere:"Nitrogen-Oxygen",atmosphereThickness:"Thin",mass:0.4,weather:"Extreme",ozoneLayer:false,description:"Passes between both stars in its orbit, swinging between freezing and scorching every few months.",bestAnswer:false,artKey:"terrestrial_cold"},
+      {id:"5-6",name:"Ashveil",type:"Terrestrial",temperature:44,waterCoverage:28,atmosphere:"Nitrogen",atmosphereThickness:"Moderate",mass:1.3,weather:"Moderate",ozoneLayer:false,description:"Stable gravity and temperature, but no oxygen — long-term survival needs tech.",bestAnswer:false,artKey:"terrestrial_desert"},
+      {id:"5-7",name:"Thornvast",type:"Volcanic",temperature:280,waterCoverage:0,atmosphere:"Sulfur Dioxide",atmosphereThickness:"Very Thick",mass:3.1,weather:"Extreme",ozoneLayer:false,description:"A volcanic nightmare constantly reshaped by eruptions from binary tidal forces.",bestAnswer:false,artKey:"volcanic"},
+      {id:"5-8",name:"Vortaxis",type:"Gas Giant",temperature:-80,waterCoverage:null,atmosphere:"Hydrogen-Helium",atmosphereThickness:"Extreme",mass:25.0,weather:"Extreme",ozoneLayer:false,description:"A massive gas giant with a continent-sized storm lasting centuries.",bestAnswer:false,artKey:"gas_giant"},
+      {id:"5-9",name:"Meteor Chunk I",type:"Meteor",temperature:200,waterCoverage:null,atmosphere:null,atmosphereThickness:null,mass:null,weather:null,ozoneLayer:false,description:"A moon-sized rock being torn apart by the gravitational pull of both stars.",bestAnswer:false,artKey:"meteor2"}
     ]
   }
 ];
 
-function drawPlanetCanvas(c2d, artKey, sz) {
-  const r = sz; c2d.clearRect(0, 0, r * 2, r * 2);
-  const cx2 = r, cy2 = r;
-  if (artKey === 'terrestrial_green') {
-    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
-    g.addColorStop(0,'#6ec86e'); g.addColorStop(.5,'#2a7a3a'); g.addColorStop(1,'#1a4a28');
-    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(60,130,200,0.7)';
-    c2d.beginPath(); c2d.ellipse(cx2+r*.1, cy2+r*.1, r*.35, r*.2, 0.4, 0, Math.PI*2); c2d.fill();
-    c2d.beginPath(); c2d.ellipse(cx2-r*.2, cy2-r*.05, r*.22, r*.13, -.3, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(255,255,255,0.18)';
-    c2d.beginPath(); c2d.ellipse(cx2-r*.05, cy2-r*.3, r*.3, r*.08, -.2, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(0,0,0,0.22)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
-  } else if (artKey === 'terrestrial_desert') {
-    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
-    g.addColorStop(0,'#e8b86a'); g.addColorStop(.5,'#c48a3a'); g.addColorStop(1,'#7a4a1a');
-    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(180,120,60,0.5)';
-    for (let i = 0; i < 4; i++) { c2d.beginPath(); c2d.ellipse(cx2+(i-1.5)*r*.3, cy2+r*.1*(i%2-.5), r*.18, r*.08, i*.4, 0, Math.PI*2); c2d.fill(); }
-    c2d.fillStyle = 'rgba(255,240,200,0.15)';
-    c2d.beginPath(); c2d.ellipse(cx2, cy2-r*.35, r*.4, r*.1, 0, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(0,0,0,0.2)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
-  } else if (artKey === 'terrestrial_red') {
-    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
-    g.addColorStop(0,'#cc5533'); g.addColorStop(.5,'#992211'); g.addColorStop(1,'#551100');
-    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(220,100,30,0.5)';
-    c2d.beginPath(); c2d.ellipse(cx2, cy2+r*.15, r*.5, r*.15, 0, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(255,180,100,0.2)';
-    c2d.beginPath(); c2d.ellipse(cx2+r*.1, cy2-r*.2, r*.45, r*.12, -.2, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(0,0,0,0.22)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
-  } else if (artKey === 'terrestrial_cold') {
-    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
-    g.addColorStop(0,'#aaccee'); g.addColorStop(.5,'#4477aa'); g.addColorStop(1,'#223355');
-    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(220,240,255,0.7)';
-    c2d.beginPath(); c2d.ellipse(cx2, cy2-r*.55, r*.5, r*.2, 0, 0, Math.PI*2); c2d.fill();
-    c2d.beginPath(); c2d.ellipse(cx2, cy2+r*.55, r*.55, r*.2, 0, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(180,220,255,0.35)';
-    c2d.beginPath(); c2d.ellipse(cx2+r*.15, cy2, r*.25, r*.4, -.1, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(0,0,0,0.2)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
-  } else if (artKey === 'terrestrial_half') {
-    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
-    g.addColorStop(0,'#e8a84a'); g.addColorStop(.5,'#c06820'); g.addColorStop(1,'#6a2800');
-    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(180,220,255,0.85)';
-    c2d.beginPath(); c2d.arc(cx2, cy2, r, Math.PI*.5, Math.PI*1.5); c2d.closePath(); c2d.fill();
-    c2d.fillStyle = 'rgba(255,255,255,0.6)';
-    c2d.beginPath(); c2d.ellipse(cx2, cy2, r*.08, r, 0, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(0,0,0,0.22)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
-  } else if (artKey === 'ice') {
-    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
-    g.addColorStop(0,'#eef6ff'); g.addColorStop(.5,'#99ccee'); g.addColorStop(1,'#3366aa');
-    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
-    c2d.strokeStyle = 'rgba(255,255,255,0.4)'; c2d.lineWidth = .8;
-    for (let i = 0; i < 5; i++) { c2d.beginPath(); c2d.moveTo(cx2-r+i*r*.4, cy2-r+i*r*.3); c2d.lineTo(cx2+r*.2, cy2+r*.6-i*r*.2); c2d.stroke(); }
-    c2d.fillStyle = 'rgba(0,0,0,0.18)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
-  } else if (artKey === 'volcanic') {
-    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
-    g.addColorStop(0,'#aa3300'); g.addColorStop(.4,'#661100'); g.addColorStop(1,'#220500');
-    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(255,100,0,0.8)';
-    c2d.beginPath(); c2d.ellipse(cx2+r*.1, cy2+r*.2, r*.35, r*.1, -.2, 0, Math.PI*2); c2d.fill();
-    c2d.beginPath(); c2d.ellipse(cx2-r*.2, cy2-r*.05, r*.2, r*.06, .3, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(255,200,0,0.6)';
-    c2d.beginPath(); c2d.ellipse(cx2+r*.15, cy2+r*.15, r*.15, r*.04, -.1, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(80,20,0,0.6)';
-    c2d.beginPath(); c2d.ellipse(cx2-r*.1, cy2-r*.25, r*.25, r*.12, .2, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(0,0,0,0.25)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
-  } else if (artKey === 'gas_giant') {
-    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
-    g.addColorStop(0,'#ddaa88'); g.addColorStop(.5,'#aa6644'); g.addColorStop(1,'#552211');
-    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
-    const bands = [['rgba(180,120,80,0.5)',-.35],['rgba(220,170,120,0.4)',-.15],['rgba(160,90,50,0.5)',.1],['rgba(210,160,100,0.4)',.3]];
-    bands.forEach(([col,off]) => { c2d.fillStyle = col; c2d.beginPath(); c2d.ellipse(cx2, cy2+r*off, r, r*.08, 0, 0, Math.PI*2); c2d.fill(); });
-    c2d.strokeStyle = 'rgba(200,150,100,0.6)'; c2d.lineWidth = r*.3; c2d.beginPath();
-    c2d.ellipse(cx2, cy2, r*1.55, r*.2, 0, 0, Math.PI*2); c2d.stroke();
-    c2d.fillStyle = 'rgba(0,0,0,0.2)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
-  } else if (artKey === 'gas_yellow') {
-    const g = c2d.createRadialGradient(cx2-r*.3, cy2-r*.3, r*.05, cx2, cy2, r);
-    g.addColorStop(0,'#eecc44'); g.addColorStop(.5,'#aaaa00'); g.addColorStop(1,'#445500');
-    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(180,180,0,0.4)';
-    c2d.beginPath(); c2d.ellipse(cx2, cy2+r*.2, r, r*.07, 0, 0, Math.PI*2); c2d.fill();
-    c2d.beginPath(); c2d.ellipse(cx2, cy2-r*.15, r, r*.06, 0, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(0,0,0,0.2)'; c2d.beginPath(); c2d.arc(cx2+r*.2, cy2+r*.2, r, 0, Math.PI*2); c2d.fill();
-  } else if (artKey === 'meteor') {
-    const g = c2d.createRadialGradient(cx2-r*.2, cy2-r*.2, r*.05, cx2, cy2, r);
-    g.addColorStop(0,'#888880'); g.addColorStop(.6,'#555550'); g.addColorStop(1,'#222220');
-    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r*.8, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(30,30,28,0.7)';
-    [[-.25,-.2,.18],[.2,.15,.12],[-.1,.25,.1],[.3,-.25,.08]].forEach(([ox,oy,cr]) => { c2d.beginPath(); c2d.arc(cx2+r*ox, cy2+r*oy, r*cr, 0, Math.PI*2); c2d.fill(); });
-    c2d.fillStyle = 'rgba(0,0,0,0.25)'; c2d.beginPath(); c2d.arc(cx2+r*.15, cy2+r*.15, r*.8, 0, Math.PI*2); c2d.fill();
-  } else {
-    const g = c2d.createRadialGradient(cx2-r*.2, cy2-r*.2, r*.05, cx2, cy2, r);
-    g.addColorStop(0,'#998877'); g.addColorStop(.6,'#665544'); g.addColorStop(1,'#332211');
-    c2d.fillStyle = g; c2d.beginPath(); c2d.arc(cx2, cy2, r*.75, 0, Math.PI*2); c2d.fill();
-    c2d.fillStyle = 'rgba(20,18,15,0.6)';
-    [[-.2,-.1,.14],[.15,.2,.1]].forEach(([ox,oy,cr]) => { c2d.beginPath(); c2d.arc(cx2+r*ox, cy2+r*oy, r*cr, 0, Math.PI*2); c2d.fill(); });
-    c2d.fillStyle = 'rgba(0,0,0,0.22)'; c2d.beginPath(); c2d.arc(cx2+r*.15, cy2+r*.15, r*.75, 0, Math.PI*2); c2d.fill();
-  }
+function getPlanetSz(p){
+  if(p.artKey==='gas_giant') return 32;
+  if(p.artKey==='gas_yellow') return 26;
+  if(p.artKey==='meteor'||p.artKey==='meteor2') return 13;
+  if(p.artKey==='volcanic') return 20;
+  if(p.artKey==='ice') return 20;
+  return 22;
 }
 
-const LEVEL_PLANET_ART = [
-  [ {artKey:'volcanic',sz:20}, {artKey:'terrestrial_green',sz:26}, {artKey:'terrestrial_desert',sz:22}, {artKey:'gas_giant',sz:32}, {artKey:'ice',sz:22} ],
-  [ {artKey:'volcanic',sz:22}, {artKey:'terrestrial_green',sz:26}, {artKey:'terrestrial_cold',sz:22}, {artKey:'terrestrial_half',sz:20}, {artKey:'gas_yellow',sz:30} ],
-  [ {artKey:'meteor',sz:16}, {artKey:'terrestrial_green',sz:24}, {artKey:'terrestrial_desert',sz:20}, {artKey:'gas_yellow',sz:28}, {artKey:'ice',sz:20} ],
-  [ {artKey:'terrestrial_red',sz:22}, {artKey:'terrestrial_green',sz:26}, {artKey:'terrestrial_cold',sz:22}, {artKey:'terrestrial_desert',sz:20}, {artKey:'meteor',sz:16} ],
-  [ {artKey:'volcanic',sz:22}, {artKey:'terrestrial_red',sz:20}, {artKey:'terrestrial_green',sz:28}, {artKey:'terrestrial_desert',sz:20}, {artKey:'gas_yellow',sz:28} ],
-];
-
-let currentLevel = 0, isZoomedOut = false, selectedPlanetIdx = null, levelSolved = false, levelScores = [], gameComplete = false;
-/** Wrong planet picks per quiz level (index 0–4); max 3 per level before Space Invaders */
-const wrongPlanetChoicesByLevel = [0, 0, 0, 0, 0];
-let isRedirectingToInvaders = false;
-const completedLevels = new Set();
-const WRONG_CHOICE_LIMIT = 3;
-const SPACE_INVADERS_BASE = '../spaceinvaders-master/spaceinvaders-master';
-const SPACE_INVADERS_SCRIPTS = [
-  `${SPACE_INVADERS_BASE}/js/starfield.js`,
-  `${SPACE_INVADERS_BASE}/js/spaceinvaders.js`
-];
-let spaceInvadersLoaded = false;
-let spaceInvadersStarted = false;
-let spaceInvadersGame = null;
-let spaceInvadersStarfield = null;
-let spaceInvadersInputListenersInstalled = false;
-/** Planet quiz level index (0–4) to restore after clearing Space Invaders wave 1 */
-let quizLevelResumeAfterInvaders = 0;
-
-const viewport = document.getElementById('viewport');
-const sun = document.getElementById('sun');
-const planetEls = [document.getElementById('p1'), document.getElementById('p2'), document.getElementById('p3'), document.getElementById('p4'), document.getElementById('p5')];
-const planetWraps = [document.getElementById('pw1'), document.getElementById('pw2'), document.getElementById('pw3'), document.getElementById('pw4'), document.getElementById('pw5')];
-const planetPanel = document.getElementById('planetPanel');
-const planetPanelTitle = document.getElementById('planetPanelTitle');
-const planetPanelMeta = document.getElementById('planetPanelMeta');
-const planetPanelDesc = document.getElementById('planetPanelDesc');
-const planetPanelStats = document.getElementById('planetPanelStats');
-const planetPanelClose = document.getElementById('planetPanelClose');
-const btnChoose = document.getElementById('btnChoose');
-const choiceResult = document.getElementById('choiceResult');
-const fadeOverlay = document.getElementById('fadeOverlay');
-const systemSplash = document.getElementById('systemSplash');
-const splashName = document.getElementById('splashName');
-const splashLevel = document.getElementById('splashLevel');
-const levelHud = document.getElementById('levelHud');
-const hudLabel = document.getElementById('hudLabel');
-const hudDots = document.getElementById('hudDots');
-const completionScreen = document.getElementById('completionScreen');
-const completionMedals = document.getElementById('completionMedals');
-const btnRestart = document.getElementById('btnRestart');
-const orbitSvg = document.getElementById('orbitSvg');
-const orbitRings = [1,2,3,4,5].map(i => document.getElementById('orbitRing' + i));
-const spaceInvadersScreen = document.getElementById('spaceInvadersScreen');
-const siStarfieldEl = document.getElementById('siStarfield');
-const siGameCanvas = document.getElementById('siGameCanvas');
-
-function ensureSpaceInvadersInputListeners() {
-  if (spaceInvadersInputListenersInstalled) return;
-  spaceInvadersInputListenersInstalled = true;
-  window.addEventListener('keydown', function onSpaceInvadersKeyDown(e) {
-    if (!spaceInvadersStarted || !spaceInvadersGame) return;
-    const keycode = e.which || window.event.keycode;
-    if (keycode === 37 || keycode === 39 || keycode === 32) e.preventDefault();
-    spaceInvadersGame.keyDown(keycode);
-  });
-  window.addEventListener('keyup', function onSpaceInvadersKeyUp(e) {
-    if (!spaceInvadersStarted || !spaceInvadersGame) return;
-    const keycode = e.which || window.event.keycode;
-    spaceInvadersGame.keyUp(keycode);
-  });
-  window.addEventListener('touchstart', function onSpaceInvadersTouchStart(e) {
-    if (!spaceInvadersStarted || !spaceInvadersGame) return;
-    spaceInvadersGame.touchstart(e);
-  }, false);
-  window.addEventListener('touchend', function onSpaceInvadersTouchEnd(e) {
-    if (!spaceInvadersStarted || !spaceInvadersGame) return;
-    spaceInvadersGame.touchend(e);
-  }, false);
-  window.addEventListener('touchmove', function onSpaceInvadersTouchMove(e) {
-    if (!spaceInvadersStarted || !spaceInvadersGame) return;
-    spaceInvadersGame.touchmove(e);
-  }, false);
-}
-
-function bindSpaceInvadersReturnHook() {
-  window.onSpaceInvadersWaveCleared = function (siGameInstance, waveLevel) {
-    if (waveLevel !== 1) return false;
-    queueMicrotask(returnToPlanetQuizAfterInvaders);
-    return true;
-  };
-}
-
-function returnToPlanetQuizAfterInvaders() {
-  window.onSpaceInvadersWaveCleared = null;
-  if (spaceInvadersStarfield) {
-    spaceInvadersStarfield.stop();
-    spaceInvadersStarfield = null;
-  }
-  if (spaceInvadersGame) {
-    spaceInvadersGame.stop();
-    spaceInvadersGame = null;
-  }
-  window.game = undefined;
-  siStarfieldEl.innerHTML = '';
-  spaceInvadersScreen.classList.remove('active');
-  spaceInvadersScreen.setAttribute('aria-hidden', 'true');
-  spaceInvadersStarted = false;
-  isRedirectingToInvaders = false;
-  wrongPlanetChoicesByLevel[quizLevelResumeAfterInvaders] = 0;
-  loadLevel(quizLevelResumeAfterInvaders);
-}
-
-function loadExternalScript(src) {
-  return new Promise((resolve, reject) => {
-    const existing = document.querySelector(`script[data-src="${src}"]`);
-    if (existing) {
-      if (existing.dataset.loaded === 'true') resolve();
-      else {
-        existing.addEventListener('load', () => resolve(), { once: true });
-        existing.addEventListener('error', () => reject(new Error(`Failed to load ${src}`)), { once: true });
-      }
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = src;
-    script.async = true;
-    script.dataset.src = src;
-    script.addEventListener('load', () => {
-      script.dataset.loaded = 'true';
-      resolve();
-    }, { once: true });
-    script.addEventListener('error', () => reject(new Error(`Failed to load ${src}`)), { once: true });
-    document.body.appendChild(script);
-  });
-}
-
-async function launchSpaceInvadersMode() {
-  if (spaceInvadersStarted) return;
-  try {
-    if (!spaceInvadersLoaded) {
-      for (const src of SPACE_INVADERS_SCRIPTS) {
-        await loadExternalScript(src);
-      }
-      spaceInvadersLoaded = true;
-    }
-    bindSpaceInvadersReturnHook();
-    ensureSpaceInvadersInputListeners();
-    spaceInvadersScreen.classList.add('active');
-    spaceInvadersScreen.setAttribute('aria-hidden', 'false');
-
-    spaceInvadersStarfield = new Starfield();
-    spaceInvadersStarfield.initialise(siStarfieldEl);
-    spaceInvadersStarfield.start();
-
-    siGameCanvas.width = 800;
-    siGameCanvas.height = 600;
-
-    spaceInvadersGame = new Game();
-    spaceInvadersGame.initialise(siGameCanvas);
-    // Original spaceinvaders.js uses a global `game` in moveToState / pushState / popState / fireRocket.
-    window.game = spaceInvadersGame;
-    spaceInvadersGame.start();
-    spaceInvadersStarted = true;
-  } catch (err) {
-    isRedirectingToInvaders = false;
-    choiceResult.innerHTML += `<div class="result-wrong"><strong>Failed to load Space Invaders.</strong><br>${err.message}</div>`;
-  }
-}
-
-// ── Orbit config: radius in px (max size) and period in ms ──
-// These are the ACTUAL radii the planet centres travel.
-// Match the SVG circle r values exactly.
-const ORBIT_CONFIG = [
-  { maxR: 130, minR: 14.45, period: 14000, dir:  1, angle: Math.PI * 0.1 },
-  { maxR: 210, minR: 23.35, period: 22000, dir: -1, angle: Math.PI * 0.6 },
-  { maxR: 295, minR: 32.80, period: 32000, dir:  1, angle: Math.PI * 1.2 },
-  { maxR: 385, minR: 42.80, period: 44000, dir: -1, angle: Math.PI * 1.8 },
-  { maxR: 440, minR: 48.90, period: 58000, dir:  1, angle: Math.PI * 0.9 },
-];
-
-// Current angle for each orbit (updated by rAF loop)
-const orbitAngles = ORBIT_CONFIG.map(c => c.angle);
-
-// Compute the pixel radius for this orbit based on current system size.
-// The system element is min(98vmin, 900px) square, centred at 50%/50%.
-// Our maxR values assume the 900px max. Scale linearly with actual size.
-function getOrbitR(i) {
-  const systemEl = document.getElementById('systemEl');
-  const systemSize = Math.min(systemEl.clientWidth, systemEl.clientHeight);
-  const scale = Math.min(systemSize, 900) / 900;
-  return ORBIT_CONFIG[i].maxR * scale;
-}
-
-// Update SVG ring radii and planet positions each frame
-let rafId = null;
-let lastTime = null;
-
-function orbitTick(ts) {
-  if (lastTime === null) lastTime = ts;
-  const dt = ts - lastTime;
-  lastTime = ts;
-
-  // Get centre in local (unscaled) system coordinates.
-  // Using getBoundingClientRect() here includes CSS zoom scale and causes
-  // diagonal drift during the zoom transition.
-  const systemEl = document.getElementById('systemEl');
-  const cx = systemEl.clientWidth / 2;
-  const cy = systemEl.clientHeight / 2;
-
-  ORBIT_CONFIG.forEach((cfg, i) => {
-    // Advance angle
-    orbitAngles[i] += (2 * Math.PI / cfg.period) * dt * cfg.dir;
-
-    const r = getOrbitR(i);
-
-    // Update SVG ring radius
-    orbitRings[i].setAttribute('r', r.toFixed(1));
-
-    // Position planet wrap at (cx + r*cos, cy + r*sin) in system-el coords
-    const px = cx + r * Math.cos(orbitAngles[i]);
-    const py = cy + r * Math.sin(orbitAngles[i]);
-    planetWraps[i].style.left = px + 'px';
-    planetWraps[i].style.top = py + 'px';
-  });
-
-  rafId = requestAnimationFrame(orbitTick);
-}
-
-function startOrbitLoop() {
-  if (rafId) cancelAnimationFrame(rafId);
-  lastTime = null;
-  rafId = requestAnimationFrame(orbitTick);
-}
-
-function init() { buildHudDots(); loadLevel(0, true); startOrbitLoop(); }
-
-function buildHudDots() {
-  hudDots.innerHTML = '';
-  for (let i = 0; i < 5; i++) {
-    const d = document.createElement('div');
-    d.className = 'hud-dot locked';
-    d.id = `hudDot${i}`;
-    d.setAttribute('role', 'button');
-    d.setAttribute('aria-label', `Go to level ${i + 1}`);
-    d.tabIndex = 0;
-    d.addEventListener('click', () => trySelectLevel(i));
-    d.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        trySelectLevel(i);
-      }
+function drawPlanetCanvas(c2d,artKey,sz){
+  const r=sz;c2d.clearRect(0,0,r*2,r*2);const cx2=r,cy2=r;
+  if(artKey==='terrestrial_green'){
+    const g=c2d.createRadialGradient(cx2-r*.3,cy2-r*.3,r*.05,cx2,cy2,r);
+    g.addColorStop(0,'#6ec86e');g.addColorStop(.5,'#2a7a3a');g.addColorStop(1,'#1a4a28');
+    c2d.fillStyle=g;c2d.beginPath();c2d.arc(cx2,cy2,r,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(60,130,200,0.7)';
+    c2d.beginPath();c2d.ellipse(cx2+r*.1,cy2+r*.1,r*.35,r*.2,0.4,0,Math.PI*2);c2d.fill();
+    c2d.beginPath();c2d.ellipse(cx2-r*.2,cy2-r*.05,r*.22,r*.13,-.3,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(255,255,255,0.18)';
+    c2d.beginPath();c2d.ellipse(cx2-r*.05,cy2-r*.3,r*.3,r*.08,-.2,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(0,0,0,0.22)';c2d.beginPath();c2d.arc(cx2+r*.2,cy2+r*.2,r,0,Math.PI*2);c2d.fill();
+  } else if(artKey==='terrestrial_desert'){
+    const g=c2d.createRadialGradient(cx2-r*.3,cy2-r*.3,r*.05,cx2,cy2,r);
+    g.addColorStop(0,'#e8b86a');g.addColorStop(.5,'#c48a3a');g.addColorStop(1,'#7a4a1a');
+    c2d.fillStyle=g;c2d.beginPath();c2d.arc(cx2,cy2,r,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(180,120,60,0.5)';
+    for(let i=0;i<4;i++){c2d.beginPath();c2d.ellipse(cx2+(i-1.5)*r*.3,cy2+r*.1*(i%2-.5),r*.18,r*.08,i*.4,0,Math.PI*2);c2d.fill();}
+    c2d.fillStyle='rgba(255,240,200,0.15)';
+    c2d.beginPath();c2d.ellipse(cx2,cy2-r*.35,r*.4,r*.1,0,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(0,0,0,0.2)';c2d.beginPath();c2d.arc(cx2+r*.2,cy2+r*.2,r,0,Math.PI*2);c2d.fill();
+  } else if(artKey==='terrestrial_red'){
+    const g=c2d.createRadialGradient(cx2-r*.3,cy2-r*.3,r*.05,cx2,cy2,r);
+    g.addColorStop(0,'#cc5533');g.addColorStop(.5,'#992211');g.addColorStop(1,'#551100');
+    c2d.fillStyle=g;c2d.beginPath();c2d.arc(cx2,cy2,r,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(220,100,30,0.5)';
+    c2d.beginPath();c2d.ellipse(cx2,cy2+r*.15,r*.5,r*.15,0,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(255,180,100,0.2)';
+    c2d.beginPath();c2d.ellipse(cx2+r*.1,cy2-r*.2,r*.45,r*.12,-.2,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(0,0,0,0.22)';c2d.beginPath();c2d.arc(cx2+r*.2,cy2+r*.2,r,0,Math.PI*2);c2d.fill();
+  } else if(artKey==='terrestrial_cold'){
+    const g=c2d.createRadialGradient(cx2-r*.3,cy2-r*.3,r*.05,cx2,cy2,r);
+    g.addColorStop(0,'#aaccee');g.addColorStop(.5,'#4477aa');g.addColorStop(1,'#223355');
+    c2d.fillStyle=g;c2d.beginPath();c2d.arc(cx2,cy2,r,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(220,240,255,0.7)';
+    c2d.beginPath();c2d.ellipse(cx2,cy2-r*.55,r*.5,r*.2,0,0,Math.PI*2);c2d.fill();
+    c2d.beginPath();c2d.ellipse(cx2,cy2+r*.55,r*.55,r*.2,0,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(180,220,255,0.35)';
+    c2d.beginPath();c2d.ellipse(cx2+r*.15,cy2,r*.25,r*.4,-.1,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(0,0,0,0.2)';c2d.beginPath();c2d.arc(cx2+r*.2,cy2+r*.2,r,0,Math.PI*2);c2d.fill();
+  } else if(artKey==='terrestrial_half'){
+    const g=c2d.createRadialGradient(cx2-r*.3,cy2-r*.3,r*.05,cx2,cy2,r);
+    g.addColorStop(0,'#e8a84a');g.addColorStop(.5,'#c06820');g.addColorStop(1,'#6a2800');
+    c2d.fillStyle=g;c2d.beginPath();c2d.arc(cx2,cy2,r,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(180,220,255,0.85)';
+    c2d.beginPath();c2d.arc(cx2,cy2,r,Math.PI*.5,Math.PI*1.5);c2d.closePath();c2d.fill();
+    c2d.fillStyle='rgba(255,255,255,0.6)';
+    c2d.beginPath();c2d.ellipse(cx2,cy2,r*.08,r,0,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(0,0,0,0.22)';c2d.beginPath();c2d.arc(cx2+r*.2,cy2+r*.2,r,0,Math.PI*2);c2d.fill();
+  } else if(artKey==='ice'){
+    const g=c2d.createRadialGradient(cx2-r*.3,cy2-r*.3,r*.05,cx2,cy2,r);
+    g.addColorStop(0,'#eef6ff');g.addColorStop(.5,'#99ccee');g.addColorStop(1,'#3366aa');
+    c2d.fillStyle=g;c2d.beginPath();c2d.arc(cx2,cy2,r,0,Math.PI*2);c2d.fill();
+    c2d.strokeStyle='rgba(255,255,255,0.4)';c2d.lineWidth=.8;
+    for(let i=0;i<5;i++){c2d.beginPath();c2d.moveTo(cx2-r+i*r*.4,cy2-r+i*r*.3);c2d.lineTo(cx2+r*.2,cy2+r*.6-i*r*.2);c2d.stroke();}
+    c2d.fillStyle='rgba(0,0,0,0.18)';c2d.beginPath();c2d.arc(cx2+r*.2,cy2+r*.2,r,0,Math.PI*2);c2d.fill();
+  } else if(artKey==='volcanic'){
+    const g=c2d.createRadialGradient(cx2-r*.3,cy2-r*.3,r*.05,cx2,cy2,r);
+    g.addColorStop(0,'#aa3300');g.addColorStop(.4,'#661100');g.addColorStop(1,'#220500');
+    c2d.fillStyle=g;c2d.beginPath();c2d.arc(cx2,cy2,r,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(255,100,0,0.8)';
+    c2d.beginPath();c2d.ellipse(cx2+r*.1,cy2+r*.2,r*.35,r*.1,-.2,0,Math.PI*2);c2d.fill();
+    c2d.beginPath();c2d.ellipse(cx2-r*.2,cy2-r*.05,r*.2,r*.06,.3,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(255,200,0,0.6)';
+    c2d.beginPath();c2d.ellipse(cx2+r*.15,cy2+r*.15,r*.15,r*.04,-.1,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(80,20,0,0.6)';
+    c2d.beginPath();c2d.ellipse(cx2-r*.1,cy2-r*.25,r*.25,r*.12,.2,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(0,0,0,0.25)';c2d.beginPath();c2d.arc(cx2+r*.2,cy2+r*.2,r,0,Math.PI*2);c2d.fill();
+  } else if(artKey==='gas_giant'){
+    const g=c2d.createRadialGradient(cx2-r*.3,cy2-r*.3,r*.05,cx2,cy2,r);
+    g.addColorStop(0,'#ddaa88');g.addColorStop(.5,'#aa6644');g.addColorStop(1,'#552211');
+    c2d.fillStyle=g;c2d.beginPath();c2d.arc(cx2,cy2,r,0,Math.PI*2);c2d.fill();
+    [['rgba(180,120,80,0.5)',-.35],['rgba(220,170,120,0.4)',-.15],['rgba(160,90,50,0.5)',.1],['rgba(210,160,100,0.4)',.3]].forEach(([col,off])=>{
+      c2d.fillStyle=col;c2d.beginPath();c2d.ellipse(cx2,cy2+r*off,r,r*.08,0,0,Math.PI*2);c2d.fill();
     });
+    c2d.strokeStyle='rgba(200,150,100,0.6)';c2d.lineWidth=r*.3;c2d.beginPath();
+    c2d.ellipse(cx2,cy2,r*1.55,r*.2,0,0,Math.PI*2);c2d.stroke();
+    c2d.fillStyle='rgba(0,0,0,0.2)';c2d.beginPath();c2d.arc(cx2+r*.2,cy2+r*.2,r,0,Math.PI*2);c2d.fill();
+  } else if(artKey==='gas_yellow'){
+    const g=c2d.createRadialGradient(cx2-r*.3,cy2-r*.3,r*.05,cx2,cy2,r);
+    g.addColorStop(0,'#eecc44');g.addColorStop(.5,'#aaaa00');g.addColorStop(1,'#445500');
+    c2d.fillStyle=g;c2d.beginPath();c2d.arc(cx2,cy2,r,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(180,180,0,0.4)';
+    c2d.beginPath();c2d.ellipse(cx2,cy2+r*.2,r,r*.07,0,0,Math.PI*2);c2d.fill();
+    c2d.beginPath();c2d.ellipse(cx2,cy2-r*.15,r,r*.06,0,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(0,0,0,0.2)';c2d.beginPath();c2d.arc(cx2+r*.2,cy2+r*.2,r,0,Math.PI*2);c2d.fill();
+  } else if(artKey==='meteor'){
+    const g=c2d.createRadialGradient(cx2-r*.2,cy2-r*.2,r*.05,cx2,cy2,r);
+    g.addColorStop(0,'#888880');g.addColorStop(.6,'#555550');g.addColorStop(1,'#222220');
+    c2d.fillStyle=g;c2d.beginPath();c2d.arc(cx2,cy2,r*.8,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(30,30,28,0.7)';
+    [[-.25,-.2,.18],[.2,.15,.12],[-.1,.25,.1],[.3,-.25,.08]].forEach(([ox,oy,cr])=>{
+      c2d.beginPath();c2d.arc(cx2+r*ox,cy2+r*oy,r*cr,0,Math.PI*2);c2d.fill();
+    });
+    c2d.fillStyle='rgba(0,0,0,0.25)';c2d.beginPath();c2d.arc(cx2+r*.15,cy2+r*.15,r*.8,0,Math.PI*2);c2d.fill();
+  } else {
+    const g=c2d.createRadialGradient(cx2-r*.2,cy2-r*.2,r*.05,cx2,cy2,r);
+    g.addColorStop(0,'#998877');g.addColorStop(.6,'#665544');g.addColorStop(1,'#332211');
+    c2d.fillStyle=g;c2d.beginPath();c2d.arc(cx2,cy2,r*.75,0,Math.PI*2);c2d.fill();
+    c2d.fillStyle='rgba(20,18,15,0.6)';
+    [[-.2,-.1,.14],[.15,.2,.1]].forEach(([ox,oy,cr])=>{
+      c2d.beginPath();c2d.arc(cx2+r*ox,cy2+r*oy,r*cr,0,Math.PI*2);c2d.fill();
+    });
+    c2d.fillStyle='rgba(0,0,0,0.22)';c2d.beginPath();c2d.arc(cx2+r*.15,cy2+r*.15,r*.75,0,Math.PI*2);c2d.fill();
+  }
+}
+
+let currentLevel=0,isZoomedOut=false,selectedPlanetIdx=null,levelSolved=false,levelScores=[];
+const completedLevels=new Set();
+let planetWraps=[],planetEls=[];
+let rafId=null,lastTime=null;
+const orbitAngles=[];
+const ORBIT_RADII=[105,160,210,255,295,330,360,385,405];
+
+const viewport=document.getElementById('viewport');
+const sun=document.getElementById('sun');
+const planetPanel=document.getElementById('planetPanel');
+const planetPanelTitle=document.getElementById('planetPanelTitle');
+const planetPanelMeta=document.getElementById('planetPanelMeta');
+const planetPanelDesc=document.getElementById('planetPanelDesc');
+const planetPanelStats=document.getElementById('planetPanelStats');
+const planetPanelClose=document.getElementById('planetPanelClose');
+const btnChoose=document.getElementById('btnChoose');
+const choiceResult=document.getElementById('choiceResult');
+const fadeOverlay=document.getElementById('fadeOverlay');
+const systemSplash=document.getElementById('systemSplash');
+const splashName=document.getElementById('splashName');
+const splashMission=document.getElementById('splashMission');
+const levelHud=document.getElementById('levelHud');
+const hudLabel=document.getElementById('hudLabel');
+const hudDots=document.getElementById('hudDots');
+const completionScreen=document.getElementById('completionScreen');
+const completionMedals=document.getElementById('completionMedals');
+const btnRestart=document.getElementById('btnRestart');
+const orbitSvg=document.getElementById('orbitSvg');
+const systemEl=document.getElementById('systemEl');
+
+function getOrbitR(i){
+  const s=Math.min(systemEl.clientWidth,systemEl.clientHeight);
+  return ORBIT_RADII[i]*(Math.min(s,900)/900);
+}
+
+function buildPlanetDom(count){
+  planetWraps.forEach(w=>w.remove());
+  planetWraps=[];planetEls=[];
+  for(let i=0;i<count;i++){
+    const wrap=document.createElement('div');
+    wrap.className='planet-wrap';
+    wrap.style.position='absolute';
+    wrap.style.transform='translate(-50%,-50%)';
+    const planet=document.createElement('div');
+    planet.className='planet';
+    const label=document.createElement('span');
+    label.className='planet-label';
+    wrap.appendChild(planet);
+    wrap.appendChild(label);
+    systemEl.appendChild(wrap);
+    planetWraps.push(wrap);
+    planetEls.push(planet);
+    const idx=i;
+    wrap.addEventListener('click',()=>{if(!isZoomedOut)return;selectPlanet(idx);});
+    wrap.addEventListener('keydown',(e)=>{if((e.key==='Enter'||e.key===' ')&&isZoomedOut)selectPlanet(idx);});
+  }
+}
+
+function buildOrbitSvg(count){
+  orbitSvg.innerHTML='';
+  for(let i=0;i<count;i++){
+    const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx','0');circle.setAttribute('cy','0');
+    circle.setAttribute('fill','none');
+    circle.setAttribute('stroke','rgba(203,213,225,0.35)');
+    circle.setAttribute('stroke-width','0.5');
+    circle.setAttribute('stroke-dasharray','4 6');
+    circle.id='orbitRing'+i;
+    orbitSvg.appendChild(circle);
+  }
+}
+
+function orbitTick(ts){
+  if(lastTime===null)lastTime=ts;
+  const dt=ts-lastTime;lastTime=ts;
+  const cx=systemEl.clientWidth/2;
+  const cy=systemEl.clientHeight/2;
+  const count=LEVELS[currentLevel].planets.length;
+  for(let i=0;i<count;i++){
+    const period=14000+i*8000;
+    const dir=i%2===0?1:-1;
+    orbitAngles[i]=(orbitAngles[i]||0)+(2*Math.PI/period)*dt*dir;
+    const r=getOrbitR(i);
+    const ring=document.getElementById('orbitRing'+i);
+    if(ring)ring.setAttribute('r',r.toFixed(1));
+    const px=cx+r*Math.cos(orbitAngles[i]);
+    const py=cy+r*Math.sin(orbitAngles[i]);
+    if(planetWraps[i]){
+      planetWraps[i].style.left=px+'px';
+      planetWraps[i].style.top=py+'px';
+    }
+  }
+  rafId=requestAnimationFrame(orbitTick);
+}
+
+function startOrbitLoop(){
+  if(rafId)cancelAnimationFrame(rafId);
+  lastTime=null;
+  rafId=requestAnimationFrame(orbitTick);
+}
+
+function buildHudDots(){
+  hudDots.innerHTML='';
+  for(let i=0;i<5;i++){
+    const d=document.createElement('div');
+    d.className='hud-dot';d.id='hudDot'+i;
+    d.setAttribute('role','button');
+    d.setAttribute('tabindex','0');
+    d.addEventListener('click',()=>tryGoToLevel(i));
+    d.addEventListener('keydown',(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tryGoToLevel(i);}});
     hudDots.appendChild(d);
   }
 }
 
-function trySelectLevel(levelIdx) {
-  const highestCompleted = completedLevels.size ? Math.max(...completedLevels) : -1;
-  const highestAllowed = Math.min(4, highestCompleted + 1);
-  if (levelIdx > highestAllowed) return;
-  if (levelIdx === currentLevel) return;
-  loadLevel(levelIdx);
+function tryGoToLevel(i){
+  if(!completedLevels.has(i)) return;
+  if(i===currentLevel) return;
+  fadeOverlay.classList.add('fade-in');
+  setTimeout(()=>{
+    loadLevel(i);
+    splashName.textContent=LEVELS[i].name;
+    splashMission.textContent=LEVELS[i].star.description;
+    systemSplash.classList.add('visible');
+    setTimeout(()=>fadeOverlay.classList.remove('fade-in'),800);
+    sun.addEventListener('click',dismissSplash,{once:true});
+  },600);
 }
 
-function updateHud() {
-  hudLabel.textContent = `Level ${currentLevel + 1} of 5`;
-  const highestCompleted = completedLevels.size ? Math.max(...completedLevels) : -1;
-  const highestAllowed = Math.min(4, highestCompleted + 1);
-  for (let i = 0; i < 5; i++) {
-    const d = document.getElementById(`hudDot${i}`);
-    d.classList.remove('done', 'active', 'clickable', 'locked');
-    const done = completedLevels.has(i);
-    const selectable = i <= highestAllowed;
-    if (done) d.classList.add('done');
-    if (selectable) d.classList.add('clickable');
-    else d.classList.add('locked');
-    if (i === currentLevel) d.classList.add('active');
-    d.setAttribute('aria-disabled', selectable ? 'false' : 'true');
+function updateHud(){
+  hudLabel.textContent=`Level ${currentLevel+1} of 5`;
+  for(let i=0;i<5;i++){
+    const d=document.getElementById('hudDot'+i);
+    d.classList.remove('done','active');
+    if(completedLevels.has(i))d.classList.add('done');
+    if(i===currentLevel)d.classList.add('active');
+    d.title=completedLevels.has(i)?`Go to Level ${i+1}`:`Level ${i+1} (locked)`;
   }
 }
 
-function loadLevel(idx, immediate = false) {
-  currentLevel = idx; isZoomedOut = false; selectedPlanetIdx = null; levelSolved = false;
-  const lv = LEVELS[idx];
-  sun.dataset.level = lv.starColor;
-  sun.className = 'sun';
-  sun.setAttribute('aria-label', `Star of ${lv.systemName} — click to explore planets`);
-
-  const arts = LEVEL_PLANET_ART[idx];
-  planetEls.forEach((el, i) => {
-    const { artKey, sz } = arts[i];
-    const diameter = sz * 2;
-    el.innerHTML = '';
-    el.style.background = 'none';
-    el.style.width = diameter + 'px';
-    el.style.height = diameter + 'px';
+function loadLevel(idx,immediate=false){
+  currentLevel=idx;isZoomedOut=false;selectedPlanetIdx=null;levelSolved=false;
+  const lv=LEVELS[idx];
+  sun.dataset.color=lv.star.color;
+  const planets=lv.planets;
+  const count=planets.length;
+  buildPlanetDom(count);
+  buildOrbitSvg(count);
+  for(let i=0;i<count;i++){
+    orbitAngles[i]=(i/count)*Math.PI*2;
+  }
+  planets.forEach((p,i)=>{
+    const sz=getPlanetSz(p);
+    const diam=sz*2;
+    const el=planetEls[i];
+    el.innerHTML='';
+    el.style.width=diam+'px';el.style.height=diam+'px';
+    el.style.background='none';
     el.classList.remove('planet--selected');
-    const canvas = document.createElement('canvas');
-    canvas.width = diameter; canvas.height = diameter;
-    canvas.style.width = diameter + 'px'; canvas.style.height = diameter + 'px';
-    canvas.style.borderRadius = '50%'; canvas.style.display = 'block';
+    const canvas=document.createElement('canvas');
+    canvas.width=diam;canvas.height=diam;
+    canvas.style.width=diam+'px';canvas.style.height=diam+'px';
+    canvas.style.borderRadius='50%';canvas.style.display='block';
     el.appendChild(canvas);
-    const ctx = canvas.getContext('2d');
-    if (ctx) drawPlanetCanvas(ctx, artKey, sz);
-
-    // Accessibility on the wrap
-    planetWraps[i].setAttribute('aria-label', lv.planets[i].name);
-    planetWraps[i].setAttribute('role', 'button');
-    planetWraps[i].setAttribute('tabindex', '0');
+    drawPlanetCanvas(canvas.getContext('2d'),p.artKey,sz);
+    const label=planetWraps[i].querySelector('.planet-label');
+    if(label)label.textContent=p.name;
+    planetWraps[i].setAttribute('aria-label',p.name);
+    planetWraps[i].setAttribute('role','button');
+    planetWraps[i].setAttribute('tabindex','0');
   });
-
   closePlanetPanel();
-  choiceResult.innerHTML = '';
-  btnChoose.disabled = false;
-  btnChoose.style.display = '';
+  choiceResult.innerHTML='';
+  btnChoose.disabled=false;
+  btnChoose.style.display='';
   viewport.classList.remove('is-zoomed-out');
   updateHud();
-  if (!immediate) levelHud.classList.add('visible');
-  else setTimeout(() => levelHud.classList.add('visible'), 400);
-
-  const subtitleEl = document.getElementById('landingSubtitle');
-  if (idx > 0) subtitleEl.textContent = lv.mission;
-  else subtitleEl.textContent = "G-class stars: A G-class star has a surface temperature of about 5,300–6,000 °C, a mass around 0.8–1.1 times the Sun, a luminosity of roughly 0.6–1.5 times solar, and a lifespan of about 8–12 billion years.";
+  if(!immediate)levelHud.classList.add('visible');
+  else setTimeout(()=>levelHud.classList.add('visible'),400);
+  document.getElementById('landingSubtitle').textContent=lv.star.description;
 }
 
-sun.addEventListener('click', () => {
-  if (isZoomedOut) { viewport.classList.remove('is-zoomed-out'); isZoomedOut = false; closePlanetPanel(); }
-  else { viewport.classList.add('is-zoomed-out'); isZoomedOut = true; }
+sun.addEventListener('click',()=>{
+  if(isZoomedOut){viewport.classList.remove('is-zoomed-out');isZoomedOut=false;closePlanetPanel();}
+  else{viewport.classList.add('is-zoomed-out');isZoomedOut=true;}
 });
 
-planetWraps.forEach((wrap, i) => {
-  wrap.addEventListener('click', () => { if (!isZoomedOut) return; selectPlanet(i); });
-  wrap.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && isZoomedOut) selectPlanet(i); });
-});
-
-function selectPlanet(i) {
-  selectedPlanetIdx = i;
-  planetEls.forEach((el, j) => el.classList.toggle('planet--selected', j === i));
+function selectPlanet(i){
+  selectedPlanetIdx=i;
+  planetEls.forEach((el,j)=>el.classList.toggle('planet--selected',j===i));
   openPlanetPanel(LEVELS[currentLevel].planets[i]);
 }
 
-function openPlanetPanel(planet) {
-  planetPanelTitle.textContent = planet.name;
-  planetPanelMeta.textContent = planet.type;
-  planetPanelDesc.textContent = planet.desc;
-  planetPanelStats.innerHTML = '';
-  Object.entries(planet.stats).forEach(([k, v]) => {
-    const row = document.createElement('div'); row.className = 'planet-panel__stat';
-    row.innerHTML = `<span class="planet-panel__label">${k}</span><span class="planet-panel__value">${v}</span>`;
+function openPlanetPanel(planet){
+  planetPanelTitle.textContent=planet.name;
+  planetPanelMeta.textContent=planet.type;
+  planetPanelDesc.textContent=planet.description;
+  planetPanelStats.innerHTML='';
+  const stats={
+    'Surface Temp':planet.temperature!=null?planet.temperature+'°C':'N/A',
+    'Atmosphere':planet.atmosphere||'None',
+    'Water':planet.waterCoverage!=null?planet.waterCoverage+'%':'None',
+    'Gravity':planet.mass!=null?planet.mass+'× Earth':'N/A',
+    'Weather':planet.weather||'N/A',
+    'Ozone Layer':planet.ozoneLayer?'Yes':'No'
+  };
+  Object.entries(stats).forEach(([k,v])=>{
+    const row=document.createElement('div');row.className='planet-panel__stat';
+    row.innerHTML=`<span class="planet-panel__label">${k}</span><span class="planet-panel__value">${v}</span>`;
     planetPanelStats.appendChild(row);
   });
-  choiceResult.innerHTML = '';
-  btnChoose.style.display = '';
-  btnChoose.disabled = levelSolved;
+  choiceResult.innerHTML='';
+  btnChoose.style.display='';
+  btnChoose.disabled=levelSolved;
   planetPanel.classList.add('planet-panel--open');
-  planetPanel.setAttribute('aria-hidden', 'false');
+  planetPanel.setAttribute('aria-hidden','false');
 }
 
-function closePlanetPanel() {
+function closePlanetPanel(){
   planetPanel.classList.remove('planet-panel--open');
-  planetPanel.setAttribute('aria-hidden', 'true');
-  planetEls.forEach(el => el.classList.remove('planet--selected'));
-  selectedPlanetIdx = null;
+  planetPanel.setAttribute('aria-hidden','true');
+  planetEls.forEach(el=>el.classList.remove('planet--selected'));
+  selectedPlanetIdx=null;
 }
 
-planetPanelClose.addEventListener('click', closePlanetPanel);
+planetPanelClose.addEventListener('click',closePlanetPanel);
 
-btnChoose.addEventListener('click', () => {
-  if (selectedPlanetIdx === null || levelSolved) return;
-  if (isRedirectingToInvaders) return;
-  const planet = LEVELS[currentLevel].planets[selectedPlanetIdx];
-  if (planet.best) {
-    levelSolved = true; btnChoose.style.display = 'none';
-    completedLevels.add(currentLevel);
-    updateHud();
-    const total = Math.round(planet.reasons.reduce((s, r) => s + r.val, 0) / planet.reasons.length);
-    levelScores.push({ name: planet.name, score: total, level: currentLevel + 1 });
-    showHabitabilityResult(planet, total);
+function scoreReasons(planet){
+  const tempScore=planet.temperature!=null?Math.max(0,Math.round(100-Math.abs(planet.temperature-18)*1.5)):0;
+  const atmScore=planet.atmosphere==='Nitrogen-Oxygen'?95:planet.atmosphere?20:0;
+  const waterScore=planet.waterCoverage!=null?planet.waterCoverage:0;
+  const gravScore=planet.mass!=null?Math.max(0,Math.round(100-Math.abs(planet.mass-1)*40)):0;
+  const weatherScore=planet.weather==='Mild'?95:planet.weather==='Moderate'?65:planet.weather==='Extreme'?10:0;
+  return[
+    {label:'Temperature',val:tempScore,note:planet.temperature!=null?planet.temperature+'°C':'Unknown'},
+    {label:'Atmosphere',val:atmScore,note:planet.atmosphere||'None'},
+    {label:'Water',val:waterScore,note:planet.waterCoverage!=null?planet.waterCoverage+'% coverage':'None'},
+    {label:'Gravity',val:gravScore,note:planet.mass!=null?planet.mass+'× Earth':'Unknown'},
+    {label:'Weather',val:weatherScore,note:planet.weather||'Unknown'}
+  ];
+}
+
+btnChoose.addEventListener('click',()=>{
+  if(selectedPlanetIdx===null||levelSolved)return;
+  const planet=LEVELS[currentLevel].planets[selectedPlanetIdx];
+  if(planet.bestAnswer){
+    levelSolved=true;btnChoose.style.display='none';
+    completedLevels.add(currentLevel);updateHud();
+    const reasons=scoreReasons(planet);
+    const total=Math.round(reasons.reduce((s,r)=>s+r.val,0)/reasons.length);
+    levelScores.push({name:planet.name,score:total,level:currentLevel+1});
+    showResult(planet,reasons,total);
   } else {
-    wrongPlanetChoicesByLevel[currentLevel] += 1;
-    choiceResult.innerHTML = `<div class="result-wrong"><strong>Not quite right.</strong><br>${planet.name} has significant habitability problems — keep exploring the other planets in this system.</div>`;
-    if (wrongPlanetChoicesByLevel[currentLevel] >= WRONG_CHOICE_LIMIT) {
-      isRedirectingToInvaders = true;
-      quizLevelResumeAfterInvaders = currentLevel;
-      choiceResult.innerHTML += `<div class="result-wrong"><strong>Too many wrong choices on this system.</strong><br>Switching to Space Invaders mode...</div>`;
-      setTimeout(() => { launchSpaceInvadersMode(); }, 700);
-    }
+    choiceResult.innerHTML=`<div class="result-wrong"><strong>Not quite.</strong><br>${planet.name} has significant problems for habitation — keep exploring.</div>`;
   }
 });
 
-function showHabitabilityResult(planet, total) {
-  let reasonsHTML = planet.reasons.map(r => {
-    const cls = r.val >= 75 ? 'great' : r.val >= 40 ? 'ok' : 'bad';
-    return `<div class="score-row"><span class="score-row-label">${r.label}</span><div class="score-bar-wrap"><div class="score-bar ${cls}" style="width:${r.val}%"></div></div><span class="score-val ${cls}">${r.val}%</span></div>`;
+function showResult(planet,reasons,total){
+  const isLast=currentLevel===4;
+  const reasonsHTML=reasons.map(r=>{
+    const cls=r.val>=75?'great':r.val>=40?'ok':'bad';
+    return `<div class="score-row"><span class="score-row-label">${r.label}</span><div class="score-bar-wrap"><div class="score-bar ${cls}" style="width:0%"></div></div><span class="score-val ${cls}">${r.val}%</span></div>`;
   }).join('');
-  const isLast = currentLevel === 4;
-  choiceResult.innerHTML = `
+  choiceResult.innerHTML=`
     <div class="result-right">
-      <div class="score-title">✓ Habitable World Found</div>
+      <div class="score-title">Habitable World Found</div>
       <div class="score-big">${total}%</div>
-      <div class="score-sub">Habitability Score for ${planet.name}</div>
+      <div class="score-sub">Habitability Score — ${planet.name}</div>
       <div class="score-reasons">${reasonsHTML}</div>
     </div>
-    <button class="btn-next" id="btnNext">${isLast ? '🏆 Complete Mission' : 'Continue to Next System →'}</button>
-  `;
-  setTimeout(() => {
-    document.querySelectorAll('.score-bar').forEach((b, i) => { b.style.width = planet.reasons[i].val + '%'; });
-  }, 50);
-  document.getElementById('btnNext').addEventListener('click', () => {
-    if (isLast) triggerCompletion(); else transitionToNextLevel();
+    <button class="btn-next" id="btnNext">${isLast?'Complete Mission':'Next System →'}</button>`;
+  setTimeout(()=>{
+    choiceResult.querySelectorAll('.score-bar').forEach((b,i)=>{b.style.width=reasons[i].val+'%';});
+  },50);
+  document.getElementById('btnNext').addEventListener('click',()=>{
+    if(isLast)triggerCompletion();else transitionToNext();
   });
 }
 
-function transitionToNextLevel() {
-  const next = currentLevel + 1;
-  const nextLv = LEVELS[next];
+function transitionToNext(){
+  const next=currentLevel+1;
+  const nextLv=LEVELS[next];
   fadeOverlay.classList.add('fade-in');
-  setTimeout(() => {
+  setTimeout(()=>{
     loadLevel(next);
-    splashName.textContent = nextLv.systemName;
-    splashLevel.textContent = `Level ${next + 1} of 5`;
+    splashName.textContent=nextLv.name;
+    splashMission.textContent=nextLv.star.description;
     systemSplash.classList.add('visible');
-    setTimeout(() => { fadeOverlay.classList.remove('fade-in'); }, 800);
-    sun.addEventListener('click', dismissSplashOnce, { once: true });
-  }, 900);
+    setTimeout(()=>fadeOverlay.classList.remove('fade-in'),800);
+    sun.addEventListener('click',dismissSplash,{once:true});
+  },900);
 }
 
-function dismissSplashOnce() { systemSplash.classList.remove('visible'); }
+function dismissSplash(){systemSplash.classList.remove('visible');}
 
-function triggerCompletion() {
-  for (let i = 0; i < 5; i++) completedLevels.add(i);
+function triggerCompletion(){
+  for(let i=0;i<5;i++)completedLevels.add(i);
   updateHud();
-  for (let i = 0; i < 5; i++) {
-    document.getElementById(`hudDot${i}`).classList.add('done');
-    document.getElementById(`hudDot${i}`).classList.remove('active');
-  }
   fadeOverlay.classList.add('fade-in');
-  setTimeout(() => { buildCompletionScreen(); completionScreen.classList.add('visible'); fadeOverlay.classList.remove('fade-in'); }, 900);
+  setTimeout(()=>{buildCompletionScreen();completionScreen.classList.add('visible');fadeOverlay.classList.remove('fade-in');},900);
 }
 
-function buildCompletionScreen() {
-  const starsEl = document.getElementById('completionStars');
-  starsEl.innerHTML = '';
-  for (let i = 0; i < 80; i++) {
-    const s = document.createElement('div'); s.className = 'c-star';
-    const size = Math.random() * 2.5 + 0.5;
-    s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*2}s;`;
+function buildCompletionScreen(){
+  const starsEl=document.getElementById('completionStars');
+  starsEl.innerHTML='';
+  for(let i=0;i<80;i++){
+    const s=document.createElement('div');s.className='c-star';
+    const sz=Math.random()*2.5+0.5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*2}s;`;
     starsEl.appendChild(s);
   }
-  const emojis = ['🌿','🌊','🔴','💠','🌟'];
-  completionMedals.innerHTML = levelScores.map((s, i) => `
-    <div class="c-medal"><div class="m-planet">${emojis[i]}</div><div class="m-name">${s.name}</div><div class="m-score">${s.score}%</div></div>
+  const emojis=['🌿','🌊','🔴','💠','🌟'];
+  completionMedals.innerHTML=levelScores.map((s,i)=>`
+    <div class="c-medal"><div class="m-name">${emojis[i]} ${s.name}</div><div class="m-score">${s.score}%</div></div>
   `).join('');
 }
 
-btnRestart.addEventListener('click', () => {
+btnRestart.addEventListener('click',()=>{
   completionScreen.classList.remove('visible');
-  levelScores = []; gameComplete = false;
-  wrongPlanetChoicesByLevel.fill(0);
-  isRedirectingToInvaders = false;
-  completedLevels.clear();
+  levelScores=[];completedLevels.clear();
   systemSplash.classList.remove('visible');
   fadeOverlay.classList.add('fade-in');
-  setTimeout(() => { loadLevel(0, true); fadeOverlay.classList.remove('fade-in'); }, 600);
+  setTimeout(()=>{loadLevel(0,true);fadeOverlay.classList.remove('fade-in');},600);
 });
 
-window.addEventListener('DOMContentLoaded', () => {
-  splashName.textContent = LEVELS[0].systemName;
-  splashLevel.textContent = 'Level 1 of 5';
+window.addEventListener('DOMContentLoaded',()=>{
+  buildHudDots();
+  loadLevel(0,true);
+  startOrbitLoop();
+  splashName.textContent=LEVELS[0].name;
+  splashMission.textContent=LEVELS[0].star.description;
   systemSplash.classList.add('visible');
-  fadeOverlay.style.opacity = '1';
-  fadeOverlay.style.transition = 'none';
-  setTimeout(() => {
-    fadeOverlay.style.transition = 'opacity 0.9s ease';
-    fadeOverlay.classList.remove('fade-in');
-    fadeOverlay.style.opacity = '';
-  }, 100);
-  sun.addEventListener('click', dismissSplashOnce, { once: true });
+  fadeOverlay.style.opacity='1';fadeOverlay.style.transition='none';
+  setTimeout(()=>{fadeOverlay.style.transition='opacity 0.9s ease';fadeOverlay.classList.remove('fade-in');fadeOverlay.style.opacity='';},100);
+  sun.addEventListener('click',dismissSplash,{once:true});
 });
 //test
 init();
