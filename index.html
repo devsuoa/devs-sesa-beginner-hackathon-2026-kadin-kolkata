@@ -746,6 +746,43 @@
 </div>
 <!-- END DIALOGUE_SYSTEM HTML -->
 
+<!-- ═══════════════════════════════════════════════════════════════
+     DIALOGUE_SYSTEM — HTML elements
+     Search for: DIALOGUE_SYSTEM to find all related blocks
+════════════════════════════════════════════════════════════════ -->
+
+<!-- Alien portrait (sits above the dialogue panel) -->
+<img id="dialoguePortrait" src="" alt="Alien guide" />
+
+<!-- Main dialogue box — click anywhere on panel to advance -->
+<div id="dialogueBox" role="dialog" aria-live="polite" aria-label="Alien dialogue">
+  <div id="dialoguePanel">
+    <div id="dialogueSpeaker"></div>
+    <div id="dialogueText"></div>
+    <div id="dialogueContinue">▼ click to continue</div>
+  </div>
+</div>
+
+<!-- Skip button — visible whenever dialogue is active -->
+<button id="dialogueSkip" type="button">Skip ✕</button>
+
+<!-- Alien HUD icon (top-right, persists after dialogue) -->
+<button id="alienHudBtn" type="button" aria-label="Replay alien dialogue" title="Talk to your alien guide">
+  <div class="ahb-emoji">👾</div>
+</button>
+
+<!-- Checklist panel (below alien HUD icon) -->
+<div id="alienChecklist" aria-label="Mission checklist">
+  <div id="aclHeader">
+    <span id="aclHeaderTitle">Mission Notes</span>
+    <button id="aclToggle" type="button" aria-label="Toggle checklist">▲</button>
+  </div>
+  <div id="aclItems">
+    <!-- Items populated by JS from DIALOGUE_DATA -->
+  </div>
+</div>
+<!-- END DIALOGUE_SYSTEM HTML -->
+
 <div id="completionScreen">
   <div class="completion-stars" id="completionStars"></div>
   <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center">
@@ -1309,7 +1346,7 @@ const DIALOGUE_DATA = [
 
   // ── Level 1 (index 0) — Green Mizorpians ──────────────────────
   {
-    alienImage: "alien1.png",                   // ← LEVEL1_IMAGE
+    alienImage: "/src/data/images/alien1.png",                   // ← LEVEL1_IMAGE
     alienName:  "Green Mizorpian",              // ← LEVEL1_NAME
 
     // LEVEL1_INTRO — shown once, skipped on replay
@@ -1340,7 +1377,7 @@ const DIALOGUE_DATA = [
 
   // ── Level 2 (index 1) — Purple Mizorpians ─────────────────────
   {
-    alienImage: "alien2.png",                   // ← LEVEL2_IMAGE
+    alienImage: "/src/data/images/alien2.png",                   // ← LEVEL2_IMAGE
     alienName:  "Purple Mizorpian",             // ← LEVEL2_NAME
 
     // LEVEL2_INTRO
@@ -1371,7 +1408,7 @@ const DIALOGUE_DATA = [
 
   // ── Level 3 (index 2) — Electric Mizorpians ───────────────────
   {
-    alienImage: "alien3.png",                   // ← LEVEL3_IMAGE
+    alienImage: "/src/data/images/alien3.png",                   // ← LEVEL3_IMAGE
     alienName:  "Electric Mizorpian",           // ← LEVEL3_NAME
 
     // LEVEL3_INTRO
@@ -1402,7 +1439,7 @@ const DIALOGUE_DATA = [
 
   // ── Level 4 (index 3) — Kurou ─────────────────────────────────
   {
-    alienImage: "alien4.png",                   // ← LEVEL4_IMAGE
+    alienImage: "/src/data/images/alien4.png",                   // ← LEVEL4_IMAGE
     alienName:  "Kurou",                        // ← LEVEL4_NAME
 
     // LEVEL4_INTRO
@@ -1430,7 +1467,7 @@ const DIALOGUE_DATA = [
 
   // ── Level 5 (index 4) — Nuurai Slug ───────────────────────────
   {
-    alienImage: "alien5.png",                   // ← LEVEL5_IMAGE
+    alienImage: "/src/data/images/alien5.png",                   // ← LEVEL5_IMAGE
     alienName:  "Nuurai Slug",                  // ← LEVEL5_NAME
 
     // LEVEL5_INTRO
